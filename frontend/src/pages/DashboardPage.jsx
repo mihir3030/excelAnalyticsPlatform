@@ -18,7 +18,7 @@ function DashboardPage() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-[230px] bg-white z-40 transform transition-transform duration-300
+        className={`fixed top-0 left-0 h-full w-[230px] bg-stone-100 pl-3 z-40 transform transition-transform duration-300
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:static md:h-full`}
       >
