@@ -3,7 +3,7 @@ import { FiCalendar } from 'react-icons/fi'
 
 function TopBar() {
   return (
-    <div className='border-b px-4 mb-4 mt-2 pb-4 border-stone-200'>
+    <div className='border-b px-4 mb-4 mt-2 pt-2 pb-4 border-stone-200'>
       {/* Container to align left & right */}
       <div className='flex items-start justify-between'>
         {/* Left: Greeting + Date */}
