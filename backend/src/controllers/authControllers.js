@@ -54,3 +54,35 @@ export const signup = async (req, res) => {
     res.status(500).json({error: `Internal Server Error - ${error}`})
   }
 };
+
+
+// Login Controller
+export const login = async (req, res) => {
+  const {email, password} = req.body
+  try {
+    // check if email is in DB or not
+    const user = await User.findOne({email})
+    if(!user) return res.status(400).json({message: "User Not found"})
+    
+    // if User is there So check password if correct or not
+    const isPassworsCorrect = await bcrypt.compare(password, user.password)
+    
+    // if password does not match return - false
+    if(!isPassworsCorrect) return res.status(400).json({message: "Wrong Email or Password"})
+
+    // if everything is right generate new token if signup token override it
+    generateToken(user._id, res)
+
+    res.status(201).json({
+      _id: user._id,
+      fullname: user.fullName,
+      email: user.email,
+      profilPic: user.profilePic,
+      role: user.role
+    })
+
+  } catch (error) {
+    res.status(500).json({error: `Internal Server Error ${error.message}`})
+    
+  }
+}
