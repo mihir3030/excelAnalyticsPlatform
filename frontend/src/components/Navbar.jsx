@@ -54,7 +54,7 @@ function Navbar() {
                 {/* Login Button */}
                 <button type='button' 
                 className='bg-pink-400 text-white px-4 py-2 rounded-md cursor-pointer'
-                onClick={() => navigate('/login')}>Login</button>
+                onClick={() => navigate('/dashboard')}>Dashboard</button>
             </div>
 
         </nav>
