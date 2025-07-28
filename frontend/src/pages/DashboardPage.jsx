@@ -3,38 +3,35 @@ import Sidebar from '../components/Dashboard/sidebar/Sidebar'
 import Dashboard from '../components/Dashboard/dashboard/Dashboard'
 
 function DashboardPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="md:grid md:grid-cols-[230px_1fr] relative">
+    <div className="h-screen overflow-hidden flex md:grid md:grid-cols-[230px_1fr]">
 
-      {/* Toggle button - mobile only */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded shadow"
-        onClick={() => setIsSidebarOpen(true)}
+      {/* Toggle button - small screens only */}
+      {!isOpen && (<button
+        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded shadow"
+        onClick={() => setIsOpen(true)}
       >
         ☰
-      </button>
+      </button>)  }
 
       {/* Sidebar */}
       <aside
-        className={`
-          fixed top-4 left-0 h-full w-[230px] z-40 shadow-md
-          transform transition-transform duration-300 ease-in-out
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0 md:static md:shadow-none 
-        `}
+        className={`fixed top-0 left-0 h-full w-[230px] bg-white z-40 transform transition-transform duration-300
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0 md:static md:h-full`}
       >
-        {/* Close button - mobile only */}
-        <div className="md:hidden flex justify-end p-4 border-b">
-          <button onClick={() => setIsSidebarOpen(false)}>✖</button>
+        {/* Close button - small screens only */}
+        <div className="md:hidden flex justify-end p-2 border-b">
+          <button onClick={() => setIsOpen(false)}>✖</button>
         </div>
 
         <Sidebar />
       </aside>
 
-      {/* Dashboard content */}
-      <main className="p-4">
+      {/* Scrollable dashboard content */}
+      <main className="overflow-y-auto h-full w-full p-4 bg-stone-100">
         <Dashboard />
       </main>
     </div>
