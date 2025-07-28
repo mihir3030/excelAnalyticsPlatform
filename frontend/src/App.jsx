@@ -3,6 +3,7 @@ import {Route, Routes, useLocation} from "react-router-dom"
 import HomePage from "./pages/HomePage"
 import DashboardPage from "./pages/DashboardPage"
 import Sidebar from "./components/Dashboard/Sidebar/Sidebar"
+import Login from "./pages/Login"
 
 function App() {
   const location = useLocation()
@@ -21,6 +22,8 @@ function App() {
        
        {/* sidebar routes */}
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/login" element={<Login />} />
+
       </Routes>
     </div>
   )
