@@ -36,7 +36,7 @@ export const signup = async (req, res) => {
     // if user save so generate jwt token
     if(newUser){
         // generate jwt token
-        generateToken(newUser._id, res)  // create jwt token
+        const token = generateToken(newUser._id, res)  // create jwt token
         await newUser.save()
 
         res.status(201).json({
@@ -44,7 +44,8 @@ export const signup = async (req, res) => {
             fullname: newUser.fullName,
             email: newUser.email,
             profilPic: newUser.profilePic,
-            role: newUser.role
+            role: newUser.role,
+            token
         })
     } else {
         res.status(400).json({message: "Invalid User Data"})
@@ -71,14 +72,15 @@ export const login = async (req, res) => {
     if(!isPassworsCorrect) return res.status(400).json({message: "Wrong Email or Password"})
 
     // if everything is right generate new token if signup token override it
-    generateToken(user._id, res)
+    const token = generateToken(user._id, res)
 
     res.status(201).json({
       _id: user._id,
       fullname: user.fullName,
       email: user.email,
       profilPic: user.profilePic,
-      role: user.role
+      role: user.role,
+      token
     })
 
   } catch (error) {
