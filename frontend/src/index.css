@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Intel+One+Mono:ital,wght@0,300..700;1,300..700&family=Outfit:wght@100..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
+@import "tailwindcss";
+
+
+body {
+    font-family: "Outfit", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    
+}
+
+
+.animation-two{
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    bottom: 200px;
+    animation: move-two 2s ease-in-out infinite;
+    left: -20px;
+} 
+.float-up-down {
+    animation: floatUpDown 5s ease-in-out infinite;
+  }
+
+  .animation-two {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    bottom: 200px;
+    left: -20px;
+    animation: moveLeftRight 4s ease-in-out infinite reverse;
+  }
+
+@keyframes floatUpDown {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateY(-15px); }
+    100% { transform: translateY(0); }
+  }
+  
+  @keyframes moveLeftRight {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(15px); }
+    100% { transform: translateY(0); }
+  }
+  
