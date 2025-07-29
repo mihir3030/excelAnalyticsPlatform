@@ -12,19 +12,17 @@ function Login() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     
-    // check if user aleady logged in so user will rediredt to dashboard page
-    const user =  useSelector((state) => state.auth.user)
-    if(user && user.token) return <Navigate to="/dashboard" />
-
-
-
     // here we select loading and error from "auth" this name same as slice name
     const {loading, error} = useSelector((state) => state.auth) 
-    
-    
+
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-
+    
+    // check if user aleady logged in so user will rediredt to dashboard page
+    const user =  useSelector((state) => state.auth.user)
+    if(user && user.token) { 
+      return <Navigate to="/dashboard" />
+    }
 
     // when Form Submit run this Function
     const handleLoginSubmit = async (e) => {
@@ -72,6 +70,8 @@ function Login() {
 
               <div className="mx-auto max-w-xs">
                 <input
+                  id="email"
+                  name="email"
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   type="email"
                   placeholder="Email"
@@ -79,6 +79,8 @@ function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
+                  id="password"
+                  name="password"
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                   type="password"
                   placeholder="Password"

@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage"
 import Sidebar from "./components/Dashboard/Sidebar/Sidebar"
 import Login from "./pages/Login"
 import ProtectedRoute from "./components/ProtectedRoute"
+import Logout from "./components/Logout"
 
 function App() {
   const location = useLocation()
@@ -29,6 +30,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
 
       </Routes>
     </div>

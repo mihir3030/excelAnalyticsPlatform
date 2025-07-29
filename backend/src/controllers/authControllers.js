@@ -94,8 +94,6 @@ export const login = async (req, res) => {
 // LOGOUT
 export const logout = async (req, res) => {
   try {
-    // clear cookies so user logout
-    res.cookie("jwt", {maxAge:0})
     res.status(200).json({message: "You have been logged out"})
   } catch (error) {
     res.status(500).json({error: `Internal Server Error ${error.message}`})
