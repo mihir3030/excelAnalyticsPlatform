@@ -92,14 +92,26 @@ export const login = async (req, res) => {
 
 
 // LOGOUT
-export const logout = async (req, res) => {
+// in-memory token blacklist
+const blacklishedTokens = []
+export const logout = (req, res) => {
+  
   try {
-    res.status(200).json({message: "You have been logged out"})
+    const authHeader = req.headers.authorization
+    const token = authHeader && authHeader.split(" ")[1];
+
+    // if token is there so blacklished token
+    if(token) {
+      blacklishedTokens.push(token);
+    }
+    res.status(200).json({message: "tis is backend --- You have been logged out from backend"})
   } catch (error) {
-    res.status(500).json({error: `Internal Server Error ${error.message}`})
+    res.status(500).json({message: `internal error ${error.message}`})
   }
 }
-
+export const isTokenBlacklished = (token) => {
+  return blacklishedTokens.includes(token)
+}
 
 /// check current user
 export const checkUser = (req, res) => {
