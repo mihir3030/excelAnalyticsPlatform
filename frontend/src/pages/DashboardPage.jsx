@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Sidebar from '../components/Dashboard/sidebar/Sidebar'
 import Dashboard from '../components/Dashboard/dashboard/Dashboard'
+import { Outlet } from 'react-router-dom'
 
 function DashboardPage() {
   const [isOpen, setIsOpen] = useState(false)
@@ -32,7 +33,7 @@ function DashboardPage() {
 
       {/* Scrollable dashboard content */}
       <main className="overflow-y-auto h-full w-full p-4 bg-stone-100">
-        <Dashboard />
+        <Outlet />
       </main>
     </div>
   )

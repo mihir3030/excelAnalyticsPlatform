@@ -7,6 +7,8 @@ import Login from "./pages/Login"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Logout from "./components/Logout"
 import SIgnupPage from "./pages/SIgnupPage"
+import Dashboard from "./components/Dashboard/dashboard/Dashboard"
+import UserInfo from "./pages/dashboard/UserInfo"
 
 function App() {
   const location = useLocation()
@@ -23,17 +25,24 @@ function App() {
         {/* Navbar routes */}
         <Route path="/" element={<HomePage />} />
        
-       {/* sidebar routes */}
-        <Route path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        } />
+        {/* Public Route */}
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/signup" element={<SIgnupPage />} />
 
+        {/* Protected Routes */}
+        <Route path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }>
+
+          {/* Main Dashboard  */}
+          <Route index element={<Dashboard />} />
+          <Route path="user-info" element={<UserInfo />} />
+
+        </Route>
 
       </Routes>
     </div>
