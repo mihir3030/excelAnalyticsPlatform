@@ -27,7 +27,7 @@ const authSlice = createSlice({
         },
 
         //Success
-        loginSuccess: (state) => {
+        loginSuccess: (state, action) => {
             state.user = action.payload   // payload is data. here we save user data in state.user
             state.token = action.payload.token
             state.loading = false
@@ -35,7 +35,7 @@ const authSlice = createSlice({
         },
 
         // Failed
-        loginFailure: (state) => {
+        loginFailure: (state, action) => {
             state.loading = false
             state.error = action.payload
         }

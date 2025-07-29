@@ -1,16 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { assets } from "../assets/assets.js";
+import { axiosInstance } from '../utils/axiosUtil.js'
+import { useNavigate } from "react-router-dom";
+
+import { useDispatch, useSelector } from "react-redux";
+import { loginStart, loginSuccess, loginFailure } from "../features/auth/authSlice.js";
 
 function Login() {
+    //dispatch - action and data go to store or reducer
+    const dispatch = useDispatch()
+
+    // here we select loading and error from "auth" this name same as slice name
+    const {loading, error} = useSelector((state) => state.auth)  
+    
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
+    const navigate = useNavigate()
 
     // when Form Submit run this Function
-    const handleLoginSubmit = (e) => {
-      e.preventDefault()
-      console.log(email, password);
-      
+    const handleLoginSubmit = async (e) => {
+     e.preventDefault()
+
+     // start dispatch
+     dispatch(loginStart())  // set loading true and error null
+     try {
+        const res = await axiosInstance.post("/auth/login", {
+          email,
+          password
+        })      
+
+        dispatch(loginSuccess(res.data))  // store user data and token in redux
+        console.log(res.data)
+        navigate("/dashboard")
+     } catch (error) {
+        const erroMesage = error.response?.data?.message || "Login Failed"
+        dispatch(loginFailure(erroMesage))  // store error message
+        console.log(erroMesage)
+     }
     }
 
   return (
