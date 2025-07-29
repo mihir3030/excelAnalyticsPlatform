@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage"
 import DashboardPage from "./pages/DashboardPage"
 import Sidebar from "./components/Dashboard/Sidebar/Sidebar"
 import Login from "./pages/Login"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
   const location = useLocation()
@@ -21,7 +22,12 @@ function App() {
         <Route path="/" element={<HomePage />} />
        
        {/* sidebar routes */}
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        } />
         <Route path="/login" element={<Login />} />
 
       </Routes>

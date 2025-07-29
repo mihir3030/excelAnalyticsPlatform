@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { assets } from "../assets/assets.js";
 import { axiosInstance } from '../utils/axiosUtil.js'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+
 
 import { useDispatch, useSelector } from "react-redux";
 import { loginStart, loginSuccess, loginFailure } from "../features/auth/authSlice.js";
@@ -9,14 +10,21 @@ import { loginStart, loginSuccess, loginFailure } from "../features/auth/authSli
 function Login() {
     //dispatch - action and data go to store or reducer
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    
+    // check if user aleady logged in so user will rediredt to dashboard page
+    const user =  useSelector((state) => state.auth.user)
+    if(user && user.token) return <Navigate to="/dashboard" />
+
+
 
     // here we select loading and error from "auth" this name same as slice name
-    const {loading, error} = useSelector((state) => state.auth)  
+    const {loading, error} = useSelector((state) => state.auth) 
+    
     
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    const navigate = useNavigate()
 
     // when Form Submit run this Function
     const handleLoginSubmit = async (e) => {
