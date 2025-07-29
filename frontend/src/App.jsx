@@ -6,6 +6,7 @@ import Sidebar from "./components/Dashboard/Sidebar/Sidebar"
 import Login from "./pages/Login"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Logout from "./components/Logout"
+import SIgnupPage from "./pages/SIgnupPage"
 
 function App() {
   const location = useLocation()
@@ -31,6 +32,8 @@ function App() {
         } />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/signup" element={<SIgnupPage />} />
+
 
       </Routes>
     </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { assets } from "../assets/assets.js";
 import { axiosInstance } from '../utils/axiosUtil.js'
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 
 
 import { useDispatch, useSelector } from "react-redux";
@@ -96,6 +96,14 @@ function Login() {
               </div>
             </div>
             </form>
+            <div className="text-center mt-8">
+                  <Link
+                    className="inline-block text-sm text-blue-500 dark:text-blue-500 align-baseline
+                     hover:text-blue-800" 
+                     to="/signup">
+                    Don't have account? Register Here
+                  </Link>
+                </div>
           </div>
         </div>
         <div className="flex-1 bg-green-100 text-center hidden lg:flex">
