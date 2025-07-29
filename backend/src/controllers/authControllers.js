@@ -36,7 +36,7 @@ export const signup = async (req, res) => {
     // if user save so generate jwt token
     if(newUser){
         // generate jwt token
-        generateToken(newUser._id, res)  // create jwt token
+        const token = generateToken(newUser._id, res)  // create jwt token
         await newUser.save()
 
         res.status(201).json({
@@ -44,7 +44,8 @@ export const signup = async (req, res) => {
             fullname: newUser.fullName,
             email: newUser.email,
             profilPic: newUser.profilePic,
-            role: newUser.role
+            role: newUser.role,
+            token
         })
     } else {
         res.status(400).json({message: "Invalid User Data"})
@@ -54,3 +55,80 @@ export const signup = async (req, res) => {
     res.status(500).json({error: `Internal Server Error - ${error}`})
   }
 };
+
+
+// Login Controller
+export const login = async (req, res) => {
+  const {email, password} = req.body
+  try {
+    // check if email is in DB or not
+    const user = await User.findOne({email})
+    if(!user) return res.status(400).json({message: "User Not found"})
+    
+    // if User is there So check password if correct or not
+    const isPassworsCorrect = await bcrypt.compare(password, user.password)
+    
+    // if password does not match return - false
+    if(!isPassworsCorrect) return res.status(400).json({message: "Wrong Email or Password"})
+
+    // if everything is right generate new token if signup token override it
+    const token = generateToken(user._id, res)
+
+    res.status(201).json({
+      _id: user._id,
+      fullname: user.fullName,
+      email: user.email,
+      profilPic: user.profilePic,
+      role: user.role,
+      token
+    })
+
+  } catch (error) {
+    res.status(500).json({error: `Internal Server Error ${error.message}`})
+    
+  }
+}
+
+
+
+// LOGOUT
+// in-memory token blacklist
+const blacklishedTokens = []
+export const logout = (req, res) => {
+  
+  try {
+    const authHeader = req.headers.authorization
+    const token = authHeader && authHeader.split(" ")[1];
+
+    // if token is there so blacklished token
+    if(token) {
+      blacklishedTokens.push(token);
+    }
+    res.status(200).json({message: "tis is backend --- You have been logged out from backend"})
+  } catch (error) {
+    res.status(500).json({message: `internal error ${error.message}`})
+  }
+}
+export const isTokenBlacklished = (token) => {
+  return blacklishedTokens.includes(token)
+}
+
+/// check current user
+export const checkUser = (req, res) => {
+  try {
+    const user = res.status(200).json(req.user)
+  } catch (error) {
+    res.status(500).json({error: `Internal error ${error}`})
+  }
+}
+
+/// get All USERS
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.status(200).json(users)
+  } catch (error) {
+    res.status(500).json({error: `Internal error ${error}`})
+    
+  }
+}
