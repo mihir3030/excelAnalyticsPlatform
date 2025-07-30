@@ -9,6 +9,7 @@ import Logout from "./components/Logout"
 import SIgnupPage from "./pages/SIgnupPage"
 import Dashboard from "./components/Dashboard/dashboard/Dashboard"
 import UserInfo from "./pages/dashboard/UserInfo"
+import UploadExcel from "./pages/dashboard/UploadExcel"
 
 function App() {
   const location = useLocation()
@@ -41,6 +42,7 @@ function App() {
           {/* Main Dashboard  */}
           <Route index element={<Dashboard />} />
           <Route path="user-info" element={<UserInfo />} />
+          <Route path="upload-excel" element={<UploadExcel />} />
 
         </Route>
 

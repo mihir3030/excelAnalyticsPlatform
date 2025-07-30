@@ -34,7 +34,10 @@ function RouteSelect({ setIsOpen }) {
     <div className='space-y-1'>
       <Route Icon={FiHome} selected={true} title="Dashboard" navigateTo="/dashboard" setIsOpen={setIsOpen} />
       <Route Icon={FiUser} selected={false} title="User" navigateTo="/dashboard/user-Info" setIsOpen={setIsOpen} />
-      <Route Icon={FiPaperclip} selected={false} title="Charts" setIsOpen={setIsOpen} />
+     
+      <Route Icon={FiPaperclip} selected={false} title="Analysis" 
+            navigateTo="/dashboard/upload-excel" setIsOpen={setIsOpen} />
+
       <Route Icon={FiHome} selected={false} title="Logout" navigateTo="/logout" setIsOpen={setIsOpen} />
     </div>
   )
