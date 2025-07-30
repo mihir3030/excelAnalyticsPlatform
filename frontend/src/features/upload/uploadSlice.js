@@ -23,10 +23,14 @@ const uploadSlice = createSlice({
         uploadFailure: (state, action) => {
             state.uploading = false,
             state.error = action.payload
+        },
+
+        setUploads: (state, action) => {
+            state.uploadData =action.payload
         }
     }
 })
 
 
-export const { uploadStart, uploadSuccess, uploadFailure } = uploadSlice.actions;
+export const { uploadStart, uploadSuccess, uploadFailure, setUploads } = uploadSlice.actions;
 export default uploadSlice.reducer

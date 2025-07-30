@@ -38,6 +38,9 @@ function RouteSelect({ setIsOpen }) {
       <Route Icon={FiPaperclip} selected={false} title="Analysis" 
             navigateTo="/dashboard/upload-excel" setIsOpen={setIsOpen} />
 
+      <Route Icon={FiPaperclip} selected={false} title="Files" 
+            navigateTo="/dashboard/user-files" setIsOpen={setIsOpen} />
+
       <Route Icon={FiHome} selected={false} title="Logout" navigateTo="/logout" setIsOpen={setIsOpen} />
     </div>
   )

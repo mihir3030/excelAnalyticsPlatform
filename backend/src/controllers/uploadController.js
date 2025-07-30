@@ -14,7 +14,9 @@ export const uploadFileController = async (req, res) => {
                 {
                     resource_type: "raw",   /// because it's not image
                     folder: 'excel-files',
-                    format: 'xlsx'  // or keep original
+                    format: 'xlsx',  // or keep original
+                    public_id: path.parse(req.file.originalname).name,  // save with original name
+                    overwrite: true  // if same file name overwrite
                 },
                 (error, result) => {
                     if (error) reject(error);
@@ -59,3 +61,17 @@ export const uploadFileController = async (req, res) => {
     }
 }
 
+
+// get user upload files from db
+export const getUserUpload = async (req, res) => {
+    try {
+        const userId = req.user._id
+
+        // find upload by user
+        const uploads = await Upload.find({user: userId}).sort({ createdAt: -1 })
+        res.status(200).json(uploads);
+
+    } catch (error) {
+        res.status(500).json({message: `Error in getting user upload files ${error.messsage}`})
+    }
+}
