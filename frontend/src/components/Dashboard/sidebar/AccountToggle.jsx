@@ -1,17 +1,22 @@
 import React from 'react'
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { useSelector } from 'react-redux'
 
 function AccountToggle() {
+  const user = useSelector((state) => state.auth.user)
+  console.log(user)
+
+  console.log(user.profilePic)
   return (
     <div className='border-b mb-4 mt-8 pb-4 border-stone-300'>
       <button className='flex p-0.5 hover:bg-stone-200 rounded transition-colors 
       relative gap-2 w-full items-center'>
-        <img src="https://api.dicebear.com/9.x/notionists/svg" alt="avtar"
+        <img src={user.profilPic} alt="avtar"
         className='size-9 rounded shrink-0 bg-violet-500 shadow'  />
         
         <div className='text-start '>
-            <span className='text-sm font-bold block tracking-wider'>Mihir Dholakia</span>
-            <span className='text-xs block text-stone-500'>mihir.dholakia777@gmail.com</span>
+            <span className='text-sm font-bold block tracking-wider'>{user.fullname}</span>
+            <span className='text-xs block text-stone-500'>{user.email}</span>
         </div>
 
         {/* ICON of UP DOWN */}

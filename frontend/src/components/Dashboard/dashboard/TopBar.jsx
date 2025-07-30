@@ -1,7 +1,18 @@
-import React from 'react'
 import { FiCalendar } from 'react-icons/fi'
+import { useSelector } from 'react-redux'
 
 function TopBar() {
+  const user = useSelector((state) => state.auth.user)
+
+  // format date
+  const today = new Date()
+  const formateDate = today.toLocaleDateString("en-us", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  })
+
   return (
     <div className='border-b px-4 mb-4 mt-2 pt-2 pb-4 border-stone-200'>
       {/* Container to align left & right */}
@@ -9,10 +20,10 @@ function TopBar() {
         {/* Left: Greeting + Date */}
         <div className='p-0.5'>
           <span className='text-sm font-bold block'>
-            🚀 Good Morning Tom!
+            🚀 Welcome {user.fullName}!
           </span>
           <span className='text-xs block text-stone-500'>
-            Tuesday, August 26, 2025
+            {formateDate}
           </span>
         </div>
 

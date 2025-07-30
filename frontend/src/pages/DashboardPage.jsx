@@ -1,9 +1,16 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Dashboard/sidebar/Sidebar'
-import Dashboard from '../components/Dashboard/dashboard/Dashboard'
+import { Outlet, useLocation } from 'react-router-dom'
 
 function DashboardPage() {
   const [isOpen, setIsOpen] = useState(false)
+  const location = useLocation()
+
+  useEffect(() => {
+    if(window.innerWidth < 768){
+      setIsOpen(false)
+    }
+  }, [location.pathname])
 
   return (
     <div className="h-screen overflow-hidden flex md:grid md:grid-cols-[230px_1fr]">
@@ -27,12 +34,12 @@ function DashboardPage() {
           <button onClick={() => setIsOpen(false)}>✖</button>
         </div>
 
-        <Sidebar />
+        <Sidebar value={setIsOpen} />
       </aside>
 
       {/* Scrollable dashboard content */}
-      <main className="overflow-y-auto h-full w-full p-4 bg-stone-100">
-        <Dashboard />
+      <main className="overflow-y-auto h-full w-full p-4 bg-stone-100" onClick={() => setIsOpen(false)}>
+        <Outlet />
       </main>
     </div>
   )

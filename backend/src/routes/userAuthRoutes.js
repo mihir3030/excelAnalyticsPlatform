@@ -1,6 +1,7 @@
 import express from 'express'
-import { signup, login, logout, checkUser, getUsers } from '../controllers/authControllers.js'
+import { signup, login, logout, checkUser, getUsers, updateProfile } from '../controllers/authControllers.js'
 import { authMiddleware } from '../middleware/authMiddleware.js'
+import multer from 'multer'
 
 // createrouter
 const router = express.Router()
@@ -25,6 +26,12 @@ router.get("/dashboard", authMiddleware, (req, res) => {
     // req.user contains verified user data
     res.json({user: req.user});
 })
+
+
+// for updating Profile
+const storage = multer.memoryStorage();
+const upload = multer({storage})
+router.put("/update-profile", authMiddleware, upload.single('profilePic'), updateProfile)
 
 // check current user
 router.get("/checkUser", checkUser)
