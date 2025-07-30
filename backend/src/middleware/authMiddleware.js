@@ -16,7 +16,7 @@ export const authMiddleware = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        req.user = decoded   /// send user to request so res can get user
+        req.user = { _id: decoded.userId };  /// send user to request so res can get user
         next();
     } catch (error) {
         res.status(401).json({message: `Invalid or errro ${error}`})

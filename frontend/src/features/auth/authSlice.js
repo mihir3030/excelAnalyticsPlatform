@@ -45,10 +45,15 @@ const authSlice = createSlice({
             state.user = null
             state.token = null
             localStorage.removeItem("user")
+        },
+
+        // for update Profile
+        updateProfile: (state, action) => {
+            state.user = {...state.user, ...action.payload}
         }
     }
 })
 
 
-export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions
+export const { loginStart, loginSuccess, loginFailure, logout, updateProfile } = authSlice.actions
 export default authSlice.reducer

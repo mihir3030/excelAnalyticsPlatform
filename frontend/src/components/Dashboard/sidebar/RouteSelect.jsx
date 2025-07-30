@@ -1,7 +1,7 @@
 import { FiHome, FiPaperclip, FiUser } from 'react-icons/fi'
 import { useNavigate, useLocation } from 'react-router-dom'
 
-const Route = ({selected, Icon, title, navigateTo}) => {
+const Route = ({selected, Icon, title, navigateTo, setIsOpen}) => {
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -10,7 +10,12 @@ const Route = ({selected, Icon, title, navigateTo}) => {
     return (
         <button 
         type='submit'
-        onClick={() => navigateTo && navigate(navigateTo)}
+        onClick={() => {
+          if(navigateTo){
+            navigate(navigateTo);
+            
+          }
+        }}
         className={`flex items-center gap-2 w-full rounded px-2 py-1.5 text-sm cursor-pointer
         transition-[box-shadow,_background-color,_color]
         ${isSelected
@@ -24,13 +29,13 @@ const Route = ({selected, Icon, title, navigateTo}) => {
     )
 }
 
-function RouteSelect() {
+function RouteSelect({ setIsOpen }) {
   return (
     <div className='space-y-1'>
-      <Route Icon={FiHome} selected={true} title="Dashboard" navigateTo="/dashboard" />
-      <Route Icon={FiUser} selected={false} title="User" navigateTo="/dashboard/user-Info" />
-      <Route Icon={FiPaperclip} selected={false} title="Charts" />
-      <Route Icon={FiHome} selected={false} title="Logout" navigateTo="/logout" />
+      <Route Icon={FiHome} selected={true} title="Dashboard" navigateTo="/dashboard" setIsOpen={setIsOpen} />
+      <Route Icon={FiUser} selected={false} title="User" navigateTo="/dashboard/user-Info" setIsOpen={setIsOpen} />
+      <Route Icon={FiPaperclip} selected={false} title="Charts" setIsOpen={setIsOpen} />
+      <Route Icon={FiHome} selected={false} title="Logout" navigateTo="/logout" setIsOpen={setIsOpen} />
     </div>
   )
 }

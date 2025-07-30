@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import {generateToken} from '../configs/utils.js'
+import cloudinary from "../configs/cloudinary.js";
 
 // Signup controller
 export const signup = async (req, res) => {
@@ -112,6 +113,50 @@ export const logout = (req, res) => {
 export const isTokenBlacklished = (token) => {
   return blacklishedTokens.includes(token)
 }
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { fullName, email } = req.body;
+
+    const updatedData = { fullName, email };
+
+    // console.log("User ID:", req.user?._id);
+    // console.log("File info:", req.file);
+    // console.log("Body:", req.body);
+      console.log("------------------------$$$$$$$$$$$------------------")
+
+    if (req.file) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "profilepics" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+
+      updatedData.profilePic = uploadResult.secure_url;
+      console.log("----------------------------------------------")
+      console.log("secure url ------ ", uploadResult.secure_url);
+      
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ updatedUser }); // ✅ Send updated user back
+
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 /// check current user
 export const checkUser = (req, res) => {
