@@ -5,6 +5,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
 import userAuthRoutes from './routes/userAuthRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js'
 
 dotenv.config()
 // create express app
@@ -23,6 +24,12 @@ app.use(cors({
 //##############################
 // --------- USER AUTH  --------
 app.use("/api/auth", userAuthRoutes)
+
+
+//##############################
+// --------- UPLOAD --------
+app.use("/api/uploads", uploadRoutes)
+
 
 
 const PORT = process.env.PORT;
