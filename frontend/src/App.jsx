@@ -11,6 +11,8 @@ import Dashboard from "./components/Dashboard/dashboard/Dashboard"
 import UserInfo from "./pages/dashboard/UserInfo"
 import UploadExcel from "./pages/dashboard/UploadExcel"
 import UserFiles from "./pages/dashboard/UserFiles"
+import FileAnalysis from "./pages/dashboard/FileAnalysis"
+import Charts from "./pages/dashboard/Charts"
 
 function App() {
   const location = useLocation()
@@ -45,6 +47,8 @@ function App() {
           <Route path="user-info" element={<UserInfo />} />
           <Route path="upload-excel" element={<UploadExcel />} />
           <Route path="user-files" element={<UserFiles />} />
+          <Route path="files/:id" element={<FileAnalysis />} />
+          <Route path="charts" element={<Charts />} />
 
         </Route>
 

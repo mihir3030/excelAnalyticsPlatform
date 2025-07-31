@@ -7,21 +7,22 @@ function DashboardPage() {
   const location = useLocation()
 
   useEffect(() => {
-    if(window.innerWidth < 768){
+    if (window.innerWidth < 768) {
       setIsOpen(false)
     }
   }, [location.pathname])
 
   return (
     <div className="h-screen overflow-hidden flex md:grid md:grid-cols-[230px_1fr]">
-
       {/* Toggle button - small screens only */}
-      {!isOpen && (<button
-        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded shadow"
-        onClick={() => setIsOpen(true)}
-      >
-        ☰
-      </button>)  }
+      {!isOpen && (
+        <button
+          className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded shadow"
+          onClick={() => setIsOpen(true)}
+        >
+          ☰
+        </button>
+      )}
 
       {/* Sidebar */}
       <aside
@@ -34,11 +35,14 @@ function DashboardPage() {
           <button onClick={() => setIsOpen(false)}>✖</button>
         </div>
 
-        <Sidebar value={setIsOpen} />
+        <Sidebar setIsOpen={setIsOpen} />
       </aside>
 
       {/* Scrollable dashboard content */}
-      <main className="overflow-y-auto h-full w-full p-4 bg-stone-100" onClick={() => setIsOpen(false)}>
+      <main
+        className="overflow-y-auto h-full w-full p-4 bg-stone-100"
+        onClick={() => setIsOpen(false)}
+      >
         <Outlet />
       </main>
     </div>
