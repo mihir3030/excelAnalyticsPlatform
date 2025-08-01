@@ -15,6 +15,7 @@ import FileAnalysis from "./pages/dashboard/FileAnalysis";
 import Charts from "./pages/dashboard/Charts";
 import PieChart from "./pages/dashboard/PieChart";
 import BarChart from "./pages/dashboard/BarChart";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function App() {
       <Routes>
         {/* Navbar routes */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/contact" element={<ContactPage />} />
 
         {/* Public Route */}
         <Route path="/login" element={<Login />} />
