@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import TopBar from "../../components/Dashboard/dashboard/TopBar";
 import { axiosInstance } from "../../utils/axiosUtil";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function FileAnalysis() {
   // get file id from parameters
   const { id } = useParams();
+  const navigate = useNavigate()
   const token = useSelector((state) => state.auth.token)
   const [fileData, setFileData] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -38,11 +39,19 @@ function FileAnalysis() {
     if (id) fetchFile();
   }, [id]);
 
+  // function that send file data charts/ page
+  const handleChartsNavigation = () => {
+    navigate(`/dashboard/files/${id}/charts`, {
+      fileData: fileData,
+      fileId: id,
+      fileName: fileData?.metadata?.originalFileName || "Unknow File"
+    })
+  }
+
   //pegination
   const startIdx = (currentPage- 1) * rowsPerPage;
   const endIdx = startIdx + rowsPerPage;
   const currentRows = fileData?.data?.slice(startIdx, endIdx)
-
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>{error}</p>
@@ -77,28 +86,44 @@ function FileAnalysis() {
             
           </div>
 
-            {/* Paggination */}
-            <div className="flex justify-start mt-4 items-center space-x-2">
-              <button className="px-4 p-2 bg-amber-400">Charts</button>
-            </div>
-            <div className="flex justify-end items-center mt-4 space-x-2 px-4 ">
-              <button
-              className="px-4 py-2 bg-emerald-500 rounded disabled:opacity-50"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}>
-                Prev
-              </button>
-              <span className="text-sm text-gray-700">
-                Page {currentPage} of {Math.ceil(fileData?.data?.length / rowsPerPage)}
-              </span>
-              <button 
-              className="px-4 py-2 bg-emerald-500 rounded disabled:opacity-50"
-              onClick={() => 
-                setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(fileData?.data?.length / rowsPerPage)))
-              }
-              disabled={currentPage === Math.ceil(fileData?.data?.length / rowsPerPage)}>
-                Next
-              </button>
+            {/* Navigation and Pagination */}
+            <div className="flex justify-between mt-4 items-center">
+              <div className="flex items-center space-x-2">
+                <button 
+                  className="px-4 py-2 bg-amber-400 rounded hover:bg-amber-500 transition"
+                  onClick={handleChartsNavigation}
+                >
+                  View Charts
+                </button>
+                <button 
+                  className="px-4 py-2 bg-blue-400 rounded hover:bg-blue-500 transition text-white"
+                  onClick={() => navigate("/dashboard/user-files")}
+                >
+                  Back to Files
+                </button>
+              </div>
+              
+              <div className="flex items-center space-x-2 px-4">
+                <button
+                  className="px-4 py-2 bg-emerald-500 rounded disabled:opacity-50 text-white"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Prev
+                </button>
+                <span className="text-sm text-gray-700">
+                  Page {currentPage} of {Math.ceil(fileData?.data?.length / rowsPerPage)}
+                </span>
+                <button 
+                  className="px-4 py-2 bg-emerald-500 rounded disabled:opacity-50 text-white"
+                  onClick={() => 
+                    setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(fileData?.data?.length / rowsPerPage)))
+                  }
+                  disabled={currentPage === Math.ceil(fileData?.data?.length / rowsPerPage)}
+                >
+                  Next
+                </button>
+              </div>
             </div>
 
         </div>

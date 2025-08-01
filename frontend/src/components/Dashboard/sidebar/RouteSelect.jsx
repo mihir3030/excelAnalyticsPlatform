@@ -1,4 +1,4 @@
-import { FiHome, FiPaperclip, FiUser } from "react-icons/fi";
+import { FiHome, FiPaperclip, FiUser, FiBarChart } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Route = ({ selected, Icon, title, navigateTo, setIsOpen }) => {
@@ -46,7 +46,7 @@ function RouteSelect({ setIsOpen }) {
         Icon={FiUser}
         selected={false}
         title="User"
-        navigateTo="/dashboard/user-Info"
+        navigateTo="/dashboard/user-info"
         setIsOpen={setIsOpen}
       />
 
@@ -65,10 +65,6 @@ function RouteSelect({ setIsOpen }) {
         navigateTo="/dashboard/user-files"
         setIsOpen={setIsOpen}
       />
-
-      {/* <Route Icon={FiPaperclip} selected={false} title="Files" 
-            navigateTo="/dashboard/files:id" setIsOpen={setIsOpen}
-            className="hidden" /> */}
 
       <Route
         Icon={FiHome}
