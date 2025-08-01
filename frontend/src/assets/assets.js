@@ -1,4 +1,4 @@
-import logo from './logo.png'
+import logo from './logo2.png'
 import loginBg from './login-bg.svg'
 
 

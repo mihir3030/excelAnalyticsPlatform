@@ -60,8 +60,8 @@ function UserInfo() {
             flex flex-col items-center justify-center"
         >
           {/* user Info */}
-          <img src={user.profilePic} className="h-30 rounded-full" />
-          <p className="mt-3 text-stone-600 text-l">{user.fullName}</p>
+          <img src={user.profilPic} className="h-30 rounded-full" />
+          <p className="mt-3 text-stone-600 text-l">{user.fullname}</p>
           <p className="text-stone-500 text-sm">{user.email}</p>
         </div>
 
