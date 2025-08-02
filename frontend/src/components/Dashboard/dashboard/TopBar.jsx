@@ -20,7 +20,7 @@ function TopBar() {
         {/* Left: Greeting + Date */}
         <div className='p-0.5'>
           <span className='text-sm font-bold block'>
-            🚀 Welcome {user.fullname}!
+            🚀 Welcome {user.fullame}!
           </span>
           <span className='text-xs block text-stone-500'>
             {formateDate}

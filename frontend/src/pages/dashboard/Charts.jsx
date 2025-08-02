@@ -257,7 +257,7 @@ export default function Charts() {
         <div
           className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:scale-105 
           hover:shadow-xl transition"
-          onClick={() => handleChartClick('bar')}
+          onClick={() => handleChartClick('bar-chart')}
           title="Bar Chart"
         >
           <h2 className="text-xl font-semibold mb-2 text-center">View Bar Chart</h2>
@@ -268,7 +268,7 @@ export default function Charts() {
         <div
           className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:scale-105
           hover:shadow-xl transition"
-          onClick={() => handleChartClick('line')}
+          onClick={() => handleChartClick('line-chart')}
           title="Line Chart"
         >
           <h2 className="text-xl font-semibold mb-2 text-center">View Line Chart</h2>

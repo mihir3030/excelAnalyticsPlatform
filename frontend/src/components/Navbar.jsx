@@ -72,7 +72,7 @@ function Navbar() {
                             key={index}
                             onClick={() => handleNavigation(link.path)}
                             className={`group flex flex-col pb-1 border-b-2 transition-all duration-300 hover:scale-105 focus:outline-none
-                                ${isScrolled ? 'text-gray-800 hover:text-blue-600' : 'text-black hover:text-blue-200 font-bold'} 
+                                ${isScrolled ? 'text-gray-800 hover:text-blue-600' : 'text-black hover:text-blue-500 font-bold'} 
                                 ${activeLink === link.path ? 'border-pink-500' : 'border-transparent hover:border-pink-300'}`
                             }
                         >

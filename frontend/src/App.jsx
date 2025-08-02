@@ -16,6 +16,7 @@ import Charts from "./pages/dashboard/Charts";
 import PieChart from "./pages/dashboard/PieChart";
 import BarChart from "./pages/dashboard/BarChart";
 import ContactPage from "./pages/ContactPage";
+import LineChart from "./pages/dashboard/LineChart";
 
 function App() {
   const location = useLocation();
@@ -57,9 +58,9 @@ function App() {
           <Route path="files/:id" element={<FileAnalysis />} />
           <Route path="files/:id/charts" element={<Charts />}>
             <Route path="pie-chart" element={<PieChart />} />
-            {/* <Route path="bar" element={<BarChart />} />
-            <Route path="line" element={<LineChart />} />
-            <Route path="doughnut" element={<DoughnutChart />} />
+            <Route path="bar-chart" element={<BarChart />} />
+            <Route path="line-chart" element={<LineChart />} />
+            {/* <Route path="doughnut" element={<DoughnutChart />} />
             <Route path="radar" element={<RadarChart />} /> */}
           </Route>
         </Route>

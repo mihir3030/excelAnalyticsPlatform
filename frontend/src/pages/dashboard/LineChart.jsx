@@ -1,12 +1,12 @@
 // components/PieChart.js
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Pie } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { useFileData } from "../../hooks/useFileData.js"
 import { ChartConfigPanel } from "../../components/ChartConfigPanel.jsx";
-import { generatePieChartData } from "../../utils/chartDataGenerators.js";
+import { generateLineChartData } from "../../utils/chartDataGenerators.js";
 
-export default function PieChart() {
+export default function LineChart() {
   const navigate = useNavigate();
   const {
     fileData,
@@ -47,7 +47,7 @@ export default function PieChart() {
     }
     
     const groupedData = groupData(selectedXAxis, selectedYAxis, 'sum');
-    const newChartData = generatePieChartData(groupedData, selectedXAxis, selectedYAxis);
+    const newChartData = generateLineChartData(groupedData, selectedXAxis, selectedYAxis);
     
     if (!newChartData) {
       alert("No valid numeric data found for the selected columns. Please choose different columns.");
@@ -115,7 +115,7 @@ export default function PieChart() {
       {showChart && chartData && (
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <Pie data={chartData} options={chartOptions} />
+            <Line data={chartData} options={chartOptions} />
           </div>
         </div>
       )}
