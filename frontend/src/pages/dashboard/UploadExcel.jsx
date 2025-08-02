@@ -3,8 +3,7 @@ import { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { axiosInstance } from "../../utils/axiosUtil.js";
 import { uploadStart, uploadSuccess, uploadFailure } from "../../features/upload/uploadSlice";
-import { FiUpload, FiX, FiCheckCircle, FiFile } from "react-icons/fi";
-import { motion } from "framer-motion";
+import { FiUpload, FiX, FiCheckCircle, FiFile, FiAlertCircle } from "react-icons/fi";
 
 function UploadExcel() {
   const dispatch = useDispatch();
@@ -58,15 +57,22 @@ function UploadExcel() {
     ];
     
     if (!validTypes.includes(file.type)) {
-      setMessage({ text: "Please upload a valid Excel file (.xlsx, .xls, .csv)", type: "error" });
+      setMessage({ 
+        text: "Please upload a valid Excel file (.xlsx, .xls, .csv)", 
+        type: "error" 
+      });
       return false;
     }
     
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      setMessage({ text: "File size exceeds 10MB limit", type: "error" });
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage({ 
+        text: "File size exceeds 10MB limit", 
+        type: "error" 
+      });
       return false;
     }
     
+    setMessage({ text: "", type: "" });
     return true;
   };
 
@@ -78,12 +84,18 @@ function UploadExcel() {
 
   const handleFileUpload = async () => {
     if (!file) {
-      setMessage({ text: "Please select a file to upload", type: "error" });
+      setMessage({ 
+        text: "Please select a file to upload", 
+        type: "error" 
+      });
       return;
     }
 
     dispatch(uploadStart());
-    setMessage({ text: "Uploading file...", type: "info" });
+    setMessage({ 
+      text: "Uploading file...", 
+      type: "info" 
+    });
     
     const formData = new FormData();
     formData.append("file", file);
@@ -103,9 +115,11 @@ function UploadExcel() {
       });
       
       dispatch(uploadSuccess(res.data));
-      setMessage({ text: "File uploaded successfully!", type: "success" });
+      setMessage({ 
+        text: "File uploaded successfully!", 
+        type: "success" 
+      });
       
-      // Reset after 3 seconds
       setTimeout(() => {
         setFile(null);
         setUploadProgress(0);
@@ -113,23 +127,21 @@ function UploadExcel() {
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Upload failed";
-      setMessage({ text: errorMessage, type: "error" });
+      setMessage({ 
+        text: errorMessage, 
+        type: "error" 
+      });
       dispatch(uploadFailure(errorMessage));
       setUploadProgress(0);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <TopBar title="Upload Excel File" />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"
-        >
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-xl">
           {/* Upload Section */}
           <div className="p-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
@@ -142,7 +154,7 @@ function UploadExcel() {
             
             {/* Drag and Drop Zone */}
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
+              className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
                 isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
               }`}
               onDragEnter={handleDragEnter}
@@ -153,25 +165,22 @@ function UploadExcel() {
               <input
                 type="file"
                 id="file-upload"
-                className="hidden"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 onChange={handleFileChange}
                 accept=".xlsx,.xls,.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
               />
               
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <FiUpload className="w-12 h-12 text-blue-400" />
+              <div className="flex flex-col items-center justify-center space-y-4 pointer-events-none">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <FiUpload className="w-8 h-8 text-blue-500" />
+                </div>
                 <div className="text-sm text-gray-600">
                   {file ? (
                     <span className="font-medium text-blue-600">{file.name}</span>
                   ) : (
                     <>
                       <span>Drag and drop your file here or </span>
-                      <label
-                        htmlFor="file-upload"
-                        className="relative cursor-pointer text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        browse files
-                      </label>
+                      <span className="text-blue-600 font-medium">browse files</span>
                     </>
                   )}
                 </div>
@@ -181,18 +190,13 @@ function UploadExcel() {
             
             {/* Selected File Preview */}
             {file && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                transition={{ duration: 0.3 }}
-                className="mt-6 bg-gray-50 rounded-lg p-4 flex items-center justify-between"
-              >
+              <div className="mt-6 bg-gray-50 rounded-lg p-4 flex items-center justify-between transition-all duration-300">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-blue-100 rounded-lg">
                     <FiFile className="w-5 h-5 text-blue-500" />
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-800 truncate max-w-xs">{file.name}</p>
+                  <div className="overflow-hidden">
+                    <p className="font-medium text-gray-800 truncate">{file.name}</p>
                     <p className="text-xs text-gray-500">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
@@ -201,10 +205,11 @@ function UploadExcel() {
                 <button
                   onClick={removeFile}
                   className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                  aria-label="Remove file"
                 >
                   <FiX className="w-5 h-5" />
                 </button>
-              </motion.div>
+              </div>
             )}
             
             {/* Progress Bar */}
@@ -214,7 +219,7 @@ function UploadExcel() {
                   <span>Uploading...</span>
                   <span>{uploadProgress}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
                   <div
                     className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
@@ -225,22 +230,20 @@ function UploadExcel() {
             
             {/* Message Display */}
             {message.text && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className={`mt-6 p-4 rounded-lg flex items-center ${
-                  message.type === "error" 
-                    ? "bg-red-100 text-red-700" 
-                    : message.type === "success" 
-                      ? "bg-green-100 text-green-700" 
-                      : "bg-blue-100 text-blue-700"
-                }`}
-              >
-                {message.type === "success" ? (
-                  <FiCheckCircle className="mr-2 flex-shrink-0" />
+              <div className={`mt-6 p-4 rounded-lg flex items-start ${
+                message.type === "error" 
+                  ? "bg-red-50 border border-red-200 text-red-700" 
+                  : message.type === "success" 
+                    ? "bg-green-50 border border-green-200 text-green-700" 
+                    : "bg-blue-50 border border-blue-200 text-blue-700"
+              }`}>
+                {message.type === "error" ? (
+                  <FiAlertCircle className="mr-3 flex-shrink-0 mt-0.5" />
+                ) : message.type === "success" ? (
+                  <FiCheckCircle className="mr-3 flex-shrink-0 mt-0.5" />
                 ) : null}
                 <span>{message.text}</span>
-              </motion.div>
+              </div>
             )}
             
             {/* Upload Button */}
@@ -248,11 +251,11 @@ function UploadExcel() {
               <button
                 onClick={handleFileUpload}
                 disabled={!file || loading}
-                className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all ${
+                className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all flex items-center justify-center ${
                   !file || loading
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow hover:shadow-md'
-                } flex items-center justify-center`}
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 shadow hover:shadow-md'
+                }`}
               >
                 {loading ? (
                   <>
@@ -275,19 +278,23 @@ function UploadExcel() {
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start">
                 <span className="text-blue-500 mr-2">•</span>
-                Ensure your file has headers in the first row
+                <span>Ensure your file has headers in the first row</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 mr-2">•</span>
-                Remove any empty rows or columns before uploading
+                <span>Remove any empty rows or columns before uploading</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 mr-2">•</span>
-                For best results, keep file size under 5MB
+                <span>For best results, keep file size under 5MB</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-500 mr-2">•</span>
+                <span>Supported formats: .xlsx, .xls, .csv</span>
               </li>
             </ul>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

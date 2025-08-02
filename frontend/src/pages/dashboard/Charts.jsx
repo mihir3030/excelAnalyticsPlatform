@@ -14,9 +14,9 @@ import {
   PointElement,
   RadialLinearScale,
 } from "chart.js";
-
 import { Pie, Bar, Line, Doughnut, Radar } from "react-chartjs-2";
 import TopBar from "../../components/Dashboard/dashboard/TopBar";
+import { FiPieChart, FiBarChart2, FiTrendingUp, FiCircle, FiArrowLeft, FiFile } from "react-icons/fi";
 
 ChartJS.register(
   ArcElement,
@@ -33,23 +33,20 @@ ChartJS.register(
 export default function Charts() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams(); // Get file ID from URL
+  const { id } = useParams();
   const token = useSelector((state) => state.auth.token);
   
-  // State for file data
   const [fileData, setFileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeChart, setActiveChart] = useState(null);
   
-  // Get file data from navigation state (if available) or fetch it
   useEffect(() => {
     const stateFileData = location.state?.fileData;
     
     if (stateFileData) {
-      // Use data from navigation state
       setFileData(stateFileData);
     } else if (id) {
-      // Fetch data if not available in state (e.g., direct navigation or refresh)
       const fetchFile = async () => {
         try {
           setLoading(true);
@@ -67,55 +64,37 @@ export default function Charts() {
     }
   }, [id, location.state, token]);
 
-  console.log(fileData)
-
-  // Check if we're on a nested route (individual chart view)
   const isNestedRoute = location.pathname !== `/dashboard/files/${id}/charts`;
 
-  // Helper function to prepare chart data from file data
-//   const prepareChartData = () => {
-//     if (!fileData?.data || !fileData?.metadata?.columns) {
-//       // Fallback to dummy data if no file data
-//       return {
-//         labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-//         values: [12, 19, 3, 5, 2, 3]
-//       };
-//     }
-
-     // Helper function to prepare chart data from file data
   const prepareChartData = () => {
-    
-      // Fallback to dummy data if no file data
+    if (!fileData?.data || !fileData?.metadata?.columns) {
       return {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        values: [12, 19, 3, 5, 2, 3]
+        labels: ["Q1", "Q2", "Q3", "Q4"],
+        values: [12500, 18900, 8300, 15000]
       };
-    
+    }
 
-    // Use actual file data - you can customize this logic based on your data structure
     const columns = fileData.metadata.columns;
     const data = fileData.data;
     
-    // For example, if you want to create a chart from the first two columns
     if (columns.length >= 2) {
-      const labelColumn = columns[5];
-      const valueColumn = columns[6];
+      const labelColumn = columns[0];
+      const valueColumn = columns[1];
       
-      const labels = data.map(row => row[labelColumn]).slice(0, 10); // Limit to 10 items
-      const values = data.map(row => parseFloat(row[valueColumn]) || 0).slice(0, 10);
+      const labels = data.map(row => row[labelColumn]).slice(0, 6);
+      const values = data.map(row => parseFloat(row[valueColumn]) || 0).slice(0, 6);
       
       return { labels, values };
     }
     
-    // Fallback
     return {
-      labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-      values: [12, 19, 3, 5, 2, 3]
+      labels: ["Q1", "Q2", "Q3", "Q4"],
+      values: [12500, 18900, 8300, 15000]
     };
   };
 
-  // Navigation handlers that preserve file data and use file ID in URL
   const handleChartClick = (chartType) => {
+    setActiveChart(chartType);
     navigate(`/dashboard/files/${id}/charts/${chartType}`, { 
       state: { 
         fileData,
@@ -126,12 +105,46 @@ export default function Charts() {
     });
   };
 
-  // Show loading or error states
-  if (loading) return <div className="p-6"><p>Loading file data...</p></div>;
-  if (error) return <div className="p-6"><p className="text-red-500">{error}</p></div>;
-  if (!fileData) return <div className="p-6"><p>No file data found.</p></div>;
+  if (loading) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
 
-  // If we're on a nested route, render the nested component
+  if (error) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md">
+        <div className="text-red-500 text-4xl mb-4">⚠️</div>
+        <h2 className="text-xl font-bold mb-2">Error Loading Data</h2>
+        <p className="text-gray-600 mb-6">{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  );
+
+  if (!fileData) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md">
+        <div className="text-gray-400 text-4xl mb-4">
+          <FiFile className="inline-block" />
+        </div>
+        <h2 className="text-xl font-bold mb-2">No Data Available</h2>
+        <p className="text-gray-600 mb-6">The requested file data could not be found.</p>
+        <button 
+          onClick={() => navigate('/dashboard')}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Return to Dashboard
+        </button>
+      </div>
+    </div>
+  );
+
   if (isNestedRoute) {
     return <Outlet context={{ fileData, fileId: id, fileName: fileData?.metadata?.originalFileName }} />;
   }
@@ -139,167 +152,128 @@ export default function Charts() {
   const chartInfo = prepareChartData();
   const fileName = fileData?.metadata?.originalFileName || 'Unknown File';
 
-  const pieData = {
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 12,
+          padding: 20,
+          font: {
+            family: "'Inter', sans-serif",
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#1F2937',
+        titleFont: {
+          size: 14,
+          weight: 'bold'
+        },
+        bodyFont: {
+          size: 12
+        },
+        padding: 12,
+        cornerRadius: 8,
+        displayColors: true,
+        boxPadding: 6
+      }
+    },
+    maintainAspectRatio: false
+  };
+
+  const chartDataConfig = (type) => ({
     labels: chartInfo.labels,
     datasets: [
       {
         label: `${fileName} Data`,
         data: chartInfo.values,
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-          "#FF6B6B",
-          "#4ECDC4",
-          "#45B7D1",
-          "#96CEB4",
+        backgroundColor: type === 'line' ? '#3B82F6' : [
+          '#3B82F6', '#10B981', '#F59E0B', '#6366F1', 
+          '#14B8A6', '#EC4899','#F97316', '#8B5CF6'
         ],
-        hoverOffset: 10,
-      },
-    ],
-  };
+        borderColor: type === 'line' ? '#3B82F6' : '#FFFFFF',
+        borderWidth: type !== 'line' ? 1 : 2,
+        tension: type === 'line' ? 0.1 : 0,
+        fill: type === 'radar',
+        pointBackgroundColor: type === 'line' ? '#1D4ED8' : undefined,
+        pointRadius: type === 'line' ? 4 : undefined
+      }
+    ]
+  });
 
-  const barData = {
-    labels: chartInfo.labels,
-    datasets: [
-      {
-        label: `${fileName} Data`,
-        data: chartInfo.values,
-        backgroundColor: "rgba(75,192,192,0.6)",
-      },
-    ],
-  };
+  const chartCards = [
+    { type: 'pie', icon: <FiPieChart size={24} />, title: 'Pie Chart' },
+    { type: 'bar', icon: <FiBarChart2 size={24} />, title: 'Bar Chart' },
+    { type: 'line', icon: <FiTrendingUp size={24} />, title: 'Line Chart' },
+    { type: 'doughnut', icon: <FiCircle size={24} />, title: 'Doughnut Chart' },
+    { type: 'radar', icon: <FiCircle size={24} />, title: 'Radar Chart' }
+  ];
 
-  const lineData = {
-    labels: chartInfo.labels,
-    datasets: [
-      {
-        label: `${fileName} Data`,
-        data: chartInfo.values,
-        fill: false,
-        borderColor: "#742774",
-      },
-    ],
-  };
-
-  const doughnutData = {
-    labels: chartInfo.labels,
-    datasets: [
-      {
-        label: `${fileName} Data`,  
-        data: chartInfo.values,
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-          "#FF6B6B",
-          "#4ECDC4",
-          "#45B7D1",
-          "#96CEB4",
-        ],
-      },
-    ],
-  };
-
-  const radarData = {
-    labels: chartInfo.labels,
-    datasets: [
-      {
-        label: `${fileName} Data`,
-        data: chartInfo.values,
-        fill: true,
-        backgroundColor: "rgba(179,181,198,0.2)",
-        borderColor: "rgba(179,181,198,1)",
-        pointBackgroundColor: "rgba(179,181,198,1)",
-      },
-    ],
-  };
-
-  // Otherwise, render the charts overview
   return (
-    <div className="bg-white rounded-lg pb-5 shadow h-auto">
-        <TopBar />
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Available Charts</h1>
-          <p className="text-gray-600 mt-2">Data from: {fileName}</p>
-        </div>
-        <button 
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
-          onClick={() => navigate(`/dashboard/files/${id}`)}
-        >
-          Back to Table
-        </button>
-      </div>
+    <div className="min-h-screen bg-white">
+      <TopBar />
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* Pie Chart */}
-        <div
-          className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:shadow-xl 
-          hover:scale-105 transition"
-          onClick={() => handleChartClick('pie-chart')}
-          title="Pie Chart"
-        >
-          <h2 className="text-xl font-semibold mb-2 text-center">
-            View Pie Chart
-          </h2>
-          <Pie data={pieData} />
-        </div>
-
-        {/* Bar Chart */}
-        <div
-          className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:scale-105 
-          hover:shadow-xl transition"
-          onClick={() => handleChartClick('bar-chart')}
-          title="Bar Chart"
-        >
-          <h2 className="text-xl font-semibold mb-2 text-center">View Bar Chart</h2>
-          <Bar data={barData} />
-        </div>
-
-        {/* Line Chart */}
-        <div
-          className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:scale-105
-          hover:shadow-xl transition"
-          onClick={() => handleChartClick('line-chart')}
-          title="Line Chart"
-        >
-          <h2 className="text-xl font-semibold mb-2 text-center">View Line Chart</h2>
-          <Line data={lineData} />
-        </div>
-
-        {/* Doughnut Chart */}
-        <div
-          className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:scale-105
-          hover:shadow-xl transition mt-3"
-          onClick={() => handleChartClick('doughnut')}
-          title="Doughnut Chart"
-        >
-          <h2 className="text-xl font-semibold mb-2 text-center">
-            View Doughnut Chart
-          </h2>
-          <Doughnut data={doughnutData} />
-        </div>
-
-        {/* Radar Chart */}
-        <div
-          className="cursor-pointer p-4 bg-stone-100 rounded shadow-l hover:scale-105
-          hover:shadow-xl transition mt-3"
-          onClick={() => handleChartClick('radar')}
-          title="Radar Chart"
-        >
-          <h2 className="text-xl font-semibold mb-2 text-center">View Radar Chart</h2>
-          <Radar data={radarData} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Header */}
+          <div className="px-8 py-6 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">Data Visualization</h1>
+                <p className="text-gray-600 mt-1">
+                  Analyzing: <span className="font-medium text-blue-600">{fileName}</span>
+                </p>
+              </div>
+              <button 
+                onClick={() => navigate(`/dashboard/files/${id}`)}
+                className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              >
+                <FiArrowLeft className="mr-2" />
+                Back to Data Table
+              </button>
+            </div>
+          </div>
+          
+          {/* Chart Grid */}
+          <div className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {chartCards.map((card) => (
+                <div
+                  key={card.type}
+                  onClick={() => handleChartClick(`${card.type}-chart`)}
+                  className={`bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer ${
+                    activeChart === `${card.type}-chart` ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                >
+                  <div className="p-5">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-blue-100 rounded-lg text-blue-600 mr-3">
+                        {card.icon}
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-800">{card.title}</h3>
+                    </div>
+                    <div className="h-64">
+                      {card.type === 'pie' && <Pie data={chartDataConfig('pie')} options={chartOptions} />}
+                      {card.type === 'bar' && <Bar data={chartDataConfig('bar')} options={chartOptions} />}
+                      {card.type === 'line' && <Line data={chartDataConfig('line')} options={chartOptions} />}
+                      {card.type === 'doughnut' && <Doughnut data={chartDataConfig('doughnut')} options={chartOptions} />}
+                      {card.type === 'radar' && <Radar data={chartDataConfig('radar')} options={chartOptions} />}
+                    </div>
+                    <div className="mt-4 text-center">
+                      <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        View Full Chart →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }
