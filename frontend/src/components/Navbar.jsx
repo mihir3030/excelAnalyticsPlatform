@@ -8,7 +8,8 @@ function Navbar() {
     
     const navLinks = [
         { name: "Home", path: "/" },
-        { name: "Contact Us", path: "/contact" }
+        { name: "Contact Us", path: "/contact" },
+       
     ]
 
     // if scrolled change color

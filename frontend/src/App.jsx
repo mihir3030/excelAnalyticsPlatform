@@ -22,7 +22,7 @@ function App() {
   const location = useLocation();
 
   // define side bar and navbar show
-  const showNavbar = ["/", "/contact"].includes(location.pathname);
+  const showNavbar = ["/", "/contact", "/login", "/signup"].includes(location.pathname);
   // const showSidebar = location.pathname.startsWith("/dashboard")
   return (
     <div>
