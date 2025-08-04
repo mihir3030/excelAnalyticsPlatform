@@ -18,6 +18,13 @@ import BarChart from "./pages/dashboard/BarChart";
 import ContactPage from "./pages/ContactPage";
 import LineChart from "./pages/dashboard/LineChart";
 
+import AdminRoute from "./components/admin/AdminRoute";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import AdminUserManagement from "./pages/admin/AdminUserManagement";
+import AdminUsers from "./pages/admin/AdminUsers";
+
+
 function App() {
   const location = useLocation();
 
@@ -64,6 +71,21 @@ function App() {
             <Route path="radar" element={<RadarChart />} /> */}
           </Route>
         </Route>
+
+       {/* ADMIN ROUTES */}
+       <Route path="/admin"
+       element={
+        <AdminRoute>
+          <AdminDashboardPage />
+        </AdminRoute>
+       }>
+
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="users/:userId" element={<AdminUserManagement />} />
+
+       </Route>
+
       </Routes>
     </div>
   );
