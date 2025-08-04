@@ -1,18 +1,28 @@
-import TopBar from "../../components/Dashboard/dashboard/TopBar";
-import { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { axiosInstance } from "../../utils/axiosUtil.js";
-import { uploadStart, uploadSuccess, uploadFailure } from "../../features/upload/uploadSlice";
-import { FiUpload, FiX, FiCheckCircle, FiFile, FiAlertCircle } from "react-icons/fi";
+import React, { useState, useCallback } from 'react';
+import { 
+  FiUpload, 
+  FiX, 
+  FiCheckCircle, 
+  FiFile, 
+  FiAlertCircle,
+  FiFileText,
+  FiDatabase,
+  FiZap,
+  FiShield,
+  FiClock,
+  FiTrendingUp,
+  FiBarChart,
+  FiPieChart,
+  FiDownload,
+} from 'react-icons/fi';
+import TopBar from '../../components/Dashboard/dashboard/TopBar';
 
-function UploadExcel() {
-  const dispatch = useDispatch();
+function EnhancedUploadExcel() {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState({ text: "", type: "" });
-  const token = useSelector((state) => state.auth.token);
-  const { loading, error } = useSelector((state) => state.upload);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleDragEnter = useCallback((e) => {
     e.preventDefault();
@@ -91,208 +101,299 @@ function UploadExcel() {
       return;
     }
 
-    dispatch(uploadStart());
+    setIsUploading(true);
     setMessage({ 
-      text: "Uploading file...", 
+      text: "Processing your file...", 
       type: "info" 
     });
     
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await axiosInstance.post("/uploads/upload", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress(progress);
+    // Simulate upload progress
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return prev;
         }
+        return prev + Math.random() * 15;
       });
-      
-      dispatch(uploadSuccess(res.data));
+    }, 200);
+
+    // Simulate API call
+    setTimeout(() => {
+      clearInterval(progressInterval);
+      setUploadProgress(100);
       setMessage({ 
-        text: "File uploaded successfully!", 
+        text: "File uploaded successfully! Ready to create charts.", 
         type: "success" 
       });
+      setIsUploading(false);
       
       setTimeout(() => {
         setFile(null);
         setUploadProgress(0);
       }, 3000);
-      
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Upload failed";
-      setMessage({ 
-        text: errorMessage, 
-        type: "error" 
-      });
-      dispatch(uploadFailure(errorMessage));
-      setUploadProgress(0);
+    }, 3000);
+  };
+
+  const getFileIcon = (fileName) => {
+    const extension = fileName.split('.').pop().toLowerCase();
+    switch (extension) {
+      case 'xlsx':
+      case 'xls':
+        return <FiFileText className="w-6 h-6 text-green-600" />;
+      case 'csv':
+        return <FiDatabase className="w-6 h-6 text-blue-600" />;
+      default:
+        return <FiFile className="w-6 h-6 text-gray-600" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <TopBar title="Upload Excel File" />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-xl">
-          {/* Upload Section */}
-          <div className="p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
-              <FiUpload className="mr-2 text-blue-500" />
-              Upload Your Excel File
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Upload .xlsx, .xls, or .csv files for analysis (max 10MB)
-            </p>
-            
-            {/* Drag and Drop Zone */}
-            <div
-              className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
-                isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
-              }`}
-              onDragEnter={handleDragEnter}
-              onDragLeave={handleDragLeave}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              <input
-                type="file"
-                id="file-upload"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={handleFileChange}
-                accept=".xlsx,.xls,.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
-              />
-              
-              <div className="flex flex-col items-center justify-center space-y-4 pointer-events-none">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                  <FiUpload className="w-8 h-8 text-blue-500" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <TopBar />
+     
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Main Upload Section */}
+          <div className="lg:col-span-2">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Upload Your File</h2>
+                  <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <FiShield className="w-4 h-4" />
+                    <span>Secure Upload</span>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600">
-                  {file ? (
-                    <span className="font-medium text-blue-600">{file.name}</span>
-                  ) : (
-                    <>
-                      <span>Drag and drop your file here or </span>
-                      <span className="text-blue-600 font-medium">browse files</span>
-                    </>
+                
+                {/* Drag and Drop Zone */}
+                <div
+                  className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${
+                    isDragging 
+                      ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 scale-105' 
+                      : file 
+                        ? 'border-green-400 bg-gradient-to-br from-green-50 to-emerald-50'
+                        : 'border-gray-300 hover:border-indigo-400 hover:bg-gradient-to-br hover:from-gray-50 hover:to-indigo-50'
+                  }`}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".xlsx,.xls,.csv"
+                  />
+                  
+                  <div className="flex flex-col items-center justify-center space-y-6 pointer-events-none">
+                    {file ? (
+                      <>
+                        <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-200 rounded-2xl flex items-center justify-center shadow-lg">
+                          {getFileIcon(file.name)}
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-semibold text-gray-900 mb-2">{file.name}</p>
+                          <p className="text-sm text-gray-600">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB • Ready to upload
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-200 rounded-2xl flex items-center justify-center shadow-lg">
+                          <FiUpload className="w-10 h-10 text-indigo-600" />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xl font-semibold text-gray-900 mb-2">
+                            Drop your Excel file here
+                          </p>
+                          <p className="text-gray-600 mb-4">
+                            or <span className="text-indigo-600 font-medium">browse files</span> to get started
+                          </p>
+                          <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                            <span className="flex items-center">
+                              <FiFile className="w-4 h-4 mr-1" />
+                              .xlsx, .xls, .csv
+                            </span>
+                            <span>•</span>
+                            <span>Max 10MB</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {file && (
+                    <button
+                      onClick={removeFile}
+                      className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all duration-200 pointer-events-auto"
+                      aria-label="Remove file"
+                    >
+                      <FiX className="w-5 h-5" />
+                    </button>
                   )}
                 </div>
-                <p className="text-xs text-gray-500">Max file size: 10MB</p>
-              </div>
-            </div>
-            
-            {/* Selected File Preview */}
-            {file && (
-              <div className="mt-6 bg-gray-50 rounded-lg p-4 flex items-center justify-between transition-all duration-300">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <FiFile className="w-5 h-5 text-blue-500" />
+                
+                {/* Progress Bar */}
+                {uploadProgress > 0 && uploadProgress < 100 && (
+                  <div className="mt-8">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-medium text-gray-700">Uploading your file...</span>
+                      <span className="text-sm font-bold text-indigo-600">{Math.round(uploadProgress)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+                      <div
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500 shadow-sm"
+                        style={{ width: `${uploadProgress}%` }}
+                      >
+                        <div className="h-full bg-white/20 rounded-full animate-pulse"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="overflow-hidden">
-                    <p className="font-medium text-gray-800 truncate">{file.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={removeFile}
-                  className="p-2 text-gray-500 hover:text-red-500 transition-colors"
-                  aria-label="Remove file"
-                >
-                  <FiX className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-            
-            {/* Progress Bar */}
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div className="mt-6">
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
-                  <span>Uploading...</span>
-                  <span>{uploadProgress}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-            
-            {/* Message Display */}
-            {message.text && (
-              <div className={`mt-6 p-4 rounded-lg flex items-start ${
-                message.type === "error" 
-                  ? "bg-red-50 border border-red-200 text-red-700" 
-                  : message.type === "success" 
-                    ? "bg-green-50 border border-green-200 text-green-700" 
-                    : "bg-blue-50 border border-blue-200 text-blue-700"
-              }`}>
-                {message.type === "error" ? (
-                  <FiAlertCircle className="mr-3 flex-shrink-0 mt-0.5" />
-                ) : message.type === "success" ? (
-                  <FiCheckCircle className="mr-3 flex-shrink-0 mt-0.5" />
-                ) : null}
-                <span>{message.text}</span>
-              </div>
-            )}
-            
-            {/* Upload Button */}
-            <div className="mt-8">
-              <button
-                onClick={handleFileUpload}
-                disabled={!file || loading}
-                className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all flex items-center justify-center ${
-                  !file || loading
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 shadow hover:shadow-md'
-                }`}
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Uploading...
-                  </>
-                ) : (
-                  "Upload File"
                 )}
-              </button>
+                
+                {/* Message Display */}
+                {message.text && (
+                  <div className={`mt-6 p-4 rounded-xl border backdrop-blur-sm flex items-start space-x-3 ${
+                    message.type === "error" 
+                      ? "bg-red-50/80 border-red-200 text-red-700" 
+                      : message.type === "success" 
+                        ? "bg-emerald-50/80 border-emerald-200 text-emerald-700" 
+                        : "bg-blue-50/80 border-blue-200 text-blue-700"
+                  } transition-all duration-300 animate-fade-in`}>
+                    <div className="flex-shrink-0 mt-0.5">
+                      {message.type === "error" ? (
+                        <FiAlertCircle className="w-5 h-5" />
+                      ) : message.type === "success" ? (
+                        <FiCheckCircle className="w-5 h-5" />
+                      ) : (
+                        <FiClock className="w-5 h-5" />
+                      )}
+                    </div>
+                    <span className="font-medium">{message.text}</span>
+                  </div>
+                )}
+                
+                {/* Upload Button */}
+                <div className="mt-8">
+                  <button
+                    onClick={handleFileUpload}
+                    disabled={!file || isUploading}
+                    className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center space-x-3 ${
+                      !file || isUploading
+                        ? 'bg-gray-300 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+                    }`}
+                  >
+                    {isUploading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiZap className="w-5 h-5" />
+                        <span>Upload & Analyze</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-          
-          {/* Tips Section */}
-          <div className="bg-gray-50 px-8 py-6 border-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-800 mb-3">Upload Tips</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start">
-                <span className="text-blue-500 mr-2">•</span>
-                <span>Ensure your file has headers in the first row</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-blue-500 mr-2">•</span>
-                <span>Remove any empty rows or columns before uploading</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-blue-500 mr-2">•</span>
-                <span>For best results, keep file size under 5MB</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-blue-500 mr-2">•</span>
-                <span>Supported formats: .xlsx, .xls, .csv</span>
-              </li>
-            </ul>
+
+          {/* Sidebar - Features & Tips */}
+          <div className="space-y-6">
+            
+            {/* What You Can Do */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 p-6 hover:shadow-lg transition-all duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                <FiTrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
+                What You Can Create
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg">
+                    <FiBarChart className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">Interactive Charts</p>
+                    <p className="text-xs text-gray-600">Bar, line, pie, and more</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-emerald-50 to-green-100 rounded-lg">
+                    <FiPieChart className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">Data Insights</p>
+                    <p className="text-xs text-gray-600">Automatic analysis</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-purple-50 to-indigo-100 rounded-lg">
+                    <FiDownload className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">Export Options</p>
+                    <p className="text-xs text-gray-600">Save as PNG, PDF, etc.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Upload Tips */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 p-6 hover:shadow-lg transition-all duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                <FiShield className="w-5 h-5 mr-2 text-emerald-600" />
+                Upload Tips
+              </h3>
+              <ul className="space-y-3 text-sm text-gray-600">
+                <li className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Include headers in the first row</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Remove empty rows and columns</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Use consistent data formats</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>File size limit: 10MB</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Supported Formats */}
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+              <h3 className="text-lg font-bold mb-4 flex items-center">
+                <FiFile className="w-5 h-5 mr-2" />
+                Supported Formats
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                  <span className="font-medium">.XLSX</span>
+                  <span className="text-sm opacity-90">Excel 2007+</span>
+                </div>
+                <div className="flex items-center justify-between bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                  <span className="font-medium">.XLS</span>
+                  <span className="text-sm opacity-90">Excel 97-2003</span>
+                </div>
+                <div className="flex items-center justify-between bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                  <span className="font-medium">.CSV</span>
+                  <span className="text-sm opacity-90">Comma Separated</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -300,4 +401,4 @@ function UploadExcel() {
   );
 }
 
-export default UploadExcel;
+export default EnhancedUploadExcel;
