@@ -8,7 +8,7 @@ export const signup = async (req, res) => {
   // signup logic
   try {
     // first we need to get signup data from body
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, role } = req.body;
 
     //validate fields are empty
     if (!fullName || !email || !password)
@@ -33,6 +33,8 @@ export const signup = async (req, res) => {
         email: email,
         password: hashedPassword
     })
+
+    if (role) newUser.role = role
 
     // if user save so generate jwt token
     if(newUser){
