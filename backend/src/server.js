@@ -17,11 +17,23 @@ const app = express();
 app.use(express.json())
 app.use(cookieParser())
 // use cross-origin for backend connect to frontend diffrent port
-app.use(cors({
-    origin: 'http://localhost:5173',
-    // credentials: true  // allow cookie to accpets for authentication
-}))
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://astounding-quokka-f9691b.netlify.app'
+];
+
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+//   credentials: true
+}));
 
 //##############################
 // --------- USER AUTH  --------
