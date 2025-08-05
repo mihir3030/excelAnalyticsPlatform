@@ -21,7 +21,7 @@ app.use(cookieParser())
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://astounding-quokka-f9691b.netlify.app'
+  'https://astounding-quokka-f9691b.netlify.app'  // netlify
 ];
 
 
