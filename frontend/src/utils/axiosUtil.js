@@ -3,7 +3,7 @@ import { store } from '../app/store'
 import { logout } from '../features/auth/authSlice'
 
 export const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5001/api',
+    baseURL: 'https://excelanalyticsplatform-4yu7.onrender.com/api',
 })
 
 // // automatically logged oyt when token is invalid
