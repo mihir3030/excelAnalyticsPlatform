@@ -70,24 +70,7 @@ function AdminSidebar({ isOpen, setIsOpen }) {
       icon: FiUsers,
       end: false
     },
-    {
-      name: 'Uploads',
-      path: '/admin/uploads',
-      icon: FiFileText,
-      end: false
-    },
-    {
-      name: 'Analytics',
-      path: '/admin/analytics',
-      icon: FiBarChart2,
-      end: false
-    },
-    {
-      name: 'Settings',
-      path: '/admin/settings',
-      icon: FiSettings,
-      end: false
-    }
+  
   ]
 
   return (

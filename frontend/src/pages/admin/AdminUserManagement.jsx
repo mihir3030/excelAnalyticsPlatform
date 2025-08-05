@@ -23,31 +23,51 @@ function AdminUserManagement() {
   const [charts, setCharts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('uploads');
+  const [uploadsPagination, setUploadsPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1
+  });
+  const [chartsPagination, setChartsPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1
+  });
   const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserData();
-  }, [userId]);
+  }, [userId, uploadsPagination.page, chartsPagination.page]);
 
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const [userRes, uploadsRes, chartsRes] = await Promise.all([
-        axiosInstance.get(`/admin/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axiosInstance.get(`/admin/users/${userId}/uploads`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axiosInstance.get(`/admin/users/${userId}/charts`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      setUser(userRes.data.user);
-      setUploads(uploadsRes.data.uploads);
-      setCharts(chartsRes.data.charts);
+      const response = await axiosInstance.get(`/admin/users/${userId}`, {
+        params: {
+          uploadsPage: uploadsPagination.page,
+          uploadsLimit: uploadsPagination.limit,
+          chartsPage: chartsPagination.page,
+          chartsLimit: chartsPagination.limit
+        },
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setUser(response.data.user);
+      setUploads(response.data.uploads.data || []);
+      setCharts(response.data.savedCharts.data || []);
+      setUploadsPagination({
+        ...uploadsPagination,
+        total: response.data.uploads.pagination.total,
+        totalPages: response.data.uploads.pagination.totalPages
+      });
+      setChartsPagination({
+        ...chartsPagination,
+        total: response.data.savedCharts.pagination.total,
+        totalPages: response.data.savedCharts.pagination.totalPages
+      });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
     } finally {
@@ -86,12 +106,11 @@ function AdminUserManagement() {
   const handleDeleteUpload = async (uploadId) => {
     if (window.confirm('Are you sure you want to delete this upload and all associated charts?')) {
       try {
-        await axiosInstance.delete(`/admin/uploads/${uploadId}`, {
+        await axiosInstance.delete(`/admin/users/${userId}/uploads/${uploadId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setUploads(uploads.filter(upload => upload._id !== uploadId));
-        // Also remove any charts associated with this upload
-        setCharts(charts.filter(chart => chart.upload?._id !== uploadId));
+        // Refresh data after deletion
+        fetchUserData();
       } catch (error) {
         console.error('Failed to delete upload:', error);
       }
@@ -101,14 +120,23 @@ function AdminUserManagement() {
   const handleDeleteChart = async (chartId) => {
     if (window.confirm('Are you sure you want to delete this chart?')) {
       try {
-        await axiosInstance.delete(`/admin/charts/${chartId}`, {
+        await axiosInstance.delete(`/admin/users/${userId}/charts/${chartId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setCharts(charts.filter(chart => chart._id !== chartId));
+        // Refresh data after deletion
+        fetchUserData();
       } catch (error) {
         console.error('Failed to delete chart:', error);
       }
     }
+  };
+
+  const handleUploadsPageChange = (newPage) => {
+    setUploadsPagination({ ...uploadsPagination, page: newPage });
+  };
+
+  const handleChartsPageChange = (newPage) => {
+    setChartsPagination({ ...chartsPagination, page: newPage });
   };
 
   if (loading) {
@@ -165,7 +193,8 @@ function AdminUserManagement() {
               </p>
               <p className="text-gray-500 text-sm flex items-center mt-1">
                 <FiClock className="w-3 h-3 mr-1" />
-                Joined {new Date(user.createdAt).toLocaleDateString()}
+                {user.createdAt ? `Joined ${new Date(user.createdAt).toLocaleDateString()}`
+                 : 'Join Date Unknow'}
               </p>
             </div>
           </div>
@@ -199,7 +228,7 @@ function AdminUserManagement() {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Uploads</p>
               <p className="text-2xl font-bold text-gray-900">
-                {uploads.length}
+                {uploadsPagination.total}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -212,7 +241,7 @@ function AdminUserManagement() {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Charts</p>
               <p className="text-2xl font-bold text-gray-900">
-                {charts.length}
+                {chartsPagination.total}
               </p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -249,7 +278,7 @@ function AdminUserManagement() {
             }`}
           >
             <FiFileText className="inline mr-2" />
-            Uploads ({uploads.length})
+            Uploads ({uploadsPagination.total})
           </button>
           <button
             onClick={() => setActiveTab('charts')}
@@ -260,7 +289,7 @@ function AdminUserManagement() {
             }`}
           >
             <FiBarChart2 className="inline mr-2" />
-            Saved Charts ({charts.length})
+            Saved Charts ({chartsPagination.total})
           </button>
         </nav>
       </div>
@@ -322,6 +351,32 @@ function AdminUserManagement() {
               </tbody>
             </table>
           </div>
+          
+          {/* Uploads Pagination */}
+          {uploadsPagination.totalPages > 1 && (
+            <div className="px-6 py-3 bg-gray-50 flex items-center justify-between border-t border-gray-200">
+              <div className="flex-1 flex justify-between items-center">
+                <button
+                  onClick={() => handleUploadsPageChange(uploadsPagination.page - 1)}
+                  disabled={uploadsPagination.page === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-700">
+                  Page {uploadsPagination.page} of {uploadsPagination.totalPages}
+                </span>
+                <button
+                  onClick={() => handleUploadsPageChange(uploadsPagination.page + 1)}
+                  disabled={uploadsPagination.page >= uploadsPagination.totalPages}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
           {uploads.length === 0 && (
             <div className="text-center py-12">
               <FiFileText className="mx-auto h-12 w-12 text-gray-300" />
@@ -391,6 +446,32 @@ function AdminUserManagement() {
               </tbody>
             </table>
           </div>
+
+          {/* Charts Pagination */}
+          {chartsPagination.totalPages > 1 && (
+            <div className="px-6 py-3 bg-gray-50 flex items-center justify-between border-t border-gray-200">
+              <div className="flex-1 flex justify-between items-center">
+                <button
+                  onClick={() => handleChartsPageChange(chartsPagination.page - 1)}
+                  disabled={chartsPagination.page === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-700">
+                  Page {chartsPagination.page} of {chartsPagination.totalPages}
+                </span>
+                <button
+                  onClick={() => handleChartsPageChange(chartsPagination.page + 1)}
+                  disabled={chartsPagination.page >= chartsPagination.totalPages}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
           {charts.length === 0 && (
             <div className="text-center py-12">
               <FiBarChart2 className="mx-auto h-12 w-12 text-gray-300" />

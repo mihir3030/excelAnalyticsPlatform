@@ -216,19 +216,7 @@ function EnhancedFileAnalysis() {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 p-6 hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">File Type</p>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {fileData?.metadata?.fileType || "Unknown"}
-                </h3>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-purple-50 to-indigo-100 rounded-xl">
-                <FiActivity className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
+        
         </div>
 
         {/* Search Filter */}

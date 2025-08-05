@@ -3,6 +3,54 @@ import User from '../models/userModel.js'
 import Upload from '../models/uploadModel.js'
 import Analysis from '../models/analysisModel.js'
 import mongoose from 'mongoose' // Added for ObjectId conversion
+import bcrypt from 'bcryptjs';
+
+import jwt from 'jsonwebtoken'; // make sure this is imported
+
+
+
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 1. Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    // 2. Verify admin role
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    }
+
+    // 3. Check password using bcrypt
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: 'Wrong Email or Password' });
+    }
+
+    // 4. Generate token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // 5. Return success response
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+      role: user.role,
+      token
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: `Internal Server Error: ${error.message}` });
+  }
+};
 
 // Get all users with their upload and analysis counts
 export const getAllUsers = async (req, res) => {
@@ -98,9 +146,24 @@ export const getUserDetails = async (req, res) => {
 
     const totalCharts = await Analysis.countDocuments({ user: userId })
 
+    const lastUploadDate = uploads.length > 0 ? uploads[0].uploadedAt : null
+    const lastChartDate = savedCharts.length > 0 ? savedCharts[0].createdAt : null
+
+    let lastActivity = null
+    if (lastUploadDate && lastChartDate) {
+      lastActivity = new Date(Math.max(new Date(lastUploadDate), new Date(lastChartDate)))
+    } else if (lastUploadDate) {
+      lastActivity = lastUploadDate
+    } else if (lastChartDate) { 
+      lastActivity = lastChartDate
+    }
+
     res.status(200).json({
       success: true,
-      user,
+      user: {
+        ...user.toObject(),
+        lastActivity
+      },
       uploads: {
         data: uploads,
         pagination: {

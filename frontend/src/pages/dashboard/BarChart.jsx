@@ -4,14 +4,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useFileData } from "../../hooks/useFileData.js";
 import { ChartConfigPanel } from "../../components/ChartConfigPanel.jsx";
-import { FiBarChart2, FiArrowLeft, FiInfo, FiAlertTriangle, FiSave } from "react-icons/fi";
+import { 
+  FiBarChart2, 
+  FiArrowLeft, 
+  FiInfo, 
+  FiAlertTriangle, 
+  FiSave,
+  FiCheck
+} from "react-icons/fi";
 import TopBar from "../../components/Dashboard/dashboard/TopBar.jsx";
-import html2canvas from "html2canvas";
+import { useSelector } from "react-redux";
+import { axiosInstance } from "../../utils/axiosUtil.js";
 
 export default function BarChart() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const chartRef = useRef(null);
+  const token = useSelector((state) => state.auth.token);
   const {
     fileData,
     loading,
@@ -30,6 +38,8 @@ export default function BarChart() {
   const [showChart, setShowChart] = useState(false);
   const [chartError, setChartError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     if (stringColumns.length > 0 && !selectedXAxis) {
@@ -42,6 +52,8 @@ export default function BarChart() {
 
   const handleGenerateChart = () => {
     setChartError("");
+    setSaveSuccess(false);
+    setSaveError("");
     
     if (!selectedXAxis || !selectedYAxis) {
       setChartError("Please select both category and value columns");
@@ -68,23 +80,66 @@ export default function BarChart() {
     setShowChart(false);
     setChartData(null);
     setChartError("");
+    setSaveSuccess(false);
+    setSaveError("");
   };
 
   const handleSaveChart = async () => {
-    if (!chartRef.current) return;
-    
+    if (!showChart || !chartData) {
+      setSaveError("Please generate a chart first before saving");
+      return;
+    }
+
     setIsSaving(true);
+    setSaveError("");
+    setSaveSuccess(false);
+
     try {
-      const canvas = await html2canvas(chartRef.current);
-      const image = canvas.toDataURL("image/png");
-      
-      const link = document.createElement("a");
-      link.download = `${fileName}_${selectedYAxis}_by_${selectedXAxis}_(${aggregation}).png`;
-      link.href = image;
-      link.click();
-    } catch (err) {
-      console.error("Error saving chart:", err);
-      setChartError("Failed to save chart image");
+      const response = await axiosInstance.post(
+        "/analysis/save",
+        {
+          uploadId: id,
+          chartType: "bar",
+          xAxis: selectedXAxis,
+          yAxis: selectedYAxis,
+          aggregation: aggregation,
+          aiSummary: "",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } else {
+        let errorMessage = "Failed to save chart";
+        try {
+          const text = await response.text();
+          if (text) {
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.message || errorMessage;
+          }
+        } catch (parseError) {
+          errorMessage = `Server error (${response.status})`;
+        }
+
+        if (response.status === 409) {
+          setSaveError("This chart configuration has already been saved");
+        } else {
+          setSaveError(errorMessage);
+        }
+      }
+    } catch (error) {
+      console.error("Error saving chart:", error);
+      if (error.name === "TypeError" && error.message.includes("fetch")) {
+        setSaveError("Unable to connect to server. Please check your connection.");
+      } else {
+        setSaveError("An error occurred while saving the chart");
+      }
     } finally {
       setIsSaving(false);
     }
@@ -203,36 +258,82 @@ export default function BarChart() {
         </div>
 
         {/* Configuration Panel */}
-          <ChartConfigPanel
-            columns={columns}
-            numericColumns={numericColumns}
-            stringColumns={stringColumns}
-            selectedXAxis={selectedXAxis}
-            setSelectedXAxis={setSelectedXAxis}
-            selectedYAxis={selectedYAxis}
-            setSelectedYAxis={setSelectedYAxis}
-            onAxisChange={handleAxisChange}
-            onGenerateChart={handleGenerateChart}
-            aggregation={aggregation}
-            setAggregation={setAggregation}
-            showAggregation={true}
-          />
+        <ChartConfigPanel
+          columns={columns}
+          numericColumns={numericColumns}
+          stringColumns={stringColumns}
+          selectedXAxis={selectedXAxis}
+          setSelectedXAxis={setSelectedXAxis}
+          selectedYAxis={selectedYAxis}
+          setSelectedYAxis={setSelectedYAxis}
+          onAxisChange={handleAxisChange}
+          onGenerateChart={handleGenerateChart}
+          aggregation={aggregation}
+          setAggregation={setAggregation}
+          showAggregation={true}
+        />
 
-          {chartError && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
-              <FiAlertTriangle className="text-yellow-500 mt-0.5 flex-shrink-0" />
-              <span className="text-sm text-yellow-700">{chartError}</span>
-            </div>
-          )}
+        {/* Error Messages */}
+        {chartError && (
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
+            <FiAlertTriangle className="text-yellow-500 mt-0.5 flex-shrink-0" />
+            <span className="text-sm text-yellow-700">{chartError}</span>
+          </div>
+        )}
+
+        {saveError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+            <FiAlertTriangle className="text-red-500 mt-0.5 flex-shrink-0" />
+            <span className="text-sm text-red-700">{saveError}</span>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {saveSuccess && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-2">
+            <FiCheck className="text-green-500 mt-0.5 flex-shrink-0" />
+            <span className="text-sm text-green-700">
+              Chart saved successfully!
+            </span>
+          </div>
+        )}
 
         {/* Chart Display */}
-        <div className="space-y-8">
+        <div className="space-y-8 mt-8">
           {showChart && chartData ? (
             <>
-              <div 
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
-                ref={chartRef}
-              >
+              {/* Save Chart Button - Above the chart */}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSaveChart}
+                  disabled={isSaving}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm ${
+                    saveSuccess
+                      ? "bg-green-100 text-green-700 border border-green-200"
+                      : "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed"
+                  }`}
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                      Saving...
+                    </>
+                  ) : saveSuccess ? (
+                    <>
+                      <FiCheck className="w-4 h-4" />
+                      Saved!
+                    </>
+                  ) : (
+                    <>
+                      <FiSave className="w-4 h-4" />
+                      Save Chart
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Chart Container */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-6">
                   <div className="h-[500px]">
                     <Bar data={chartData} options={chartOptions} />
@@ -240,75 +341,53 @@ export default function BarChart() {
                 </div>
               </div>
 
-              {/* Chart Actions and Information */}
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <FiInfo className="text-blue-500" />
-                    Chart Details
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">File Information</h4>
-                        <p className="mt-1 text-gray-800">{fileName}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Chart Type</h4>
-                        <p className="mt-1 text-gray-800">Bar Chart</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Category Column</h4>
-                        <p className="mt-1 text-gray-800">{selectedXAxis}</p>
-                      </div>
+              {/* Chart Information */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <FiInfo className="text-blue-500" />
+                  Chart Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        File Information
+                      </h4>
+                      <p className="mt-1 text-gray-800">{fileName}</p>
                     </div>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Value Column</h4>
-                        <p className="mt-1 text-gray-800">{selectedYAxis}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Aggregation</h4>
-                        <p className="mt-1 text-gray-800">{aggregation}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Total Bars</h4>
-                        <p className="mt-1 text-gray-800">{chartData.labels.length}</p>
-                      </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Chart Type
+                      </h4>
+                      <p className="mt-1 text-gray-800">Bar Chart</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Category Column
+                      </h4>
+                      <p className="mt-1 text-gray-800">{selectedXAxis}</p>
                     </div>
                   </div>
-                </div>
-
-                {/* Save Chart Button */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Chart Actions</h3>
-                  <button
-                    onClick={handleSaveChart}
-                    disabled={isSaving}
-                    className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all flex items-center justify-center ${
-                      isSaving
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow hover:shadow-md'
-                    }`}
-                  >
-                    {isSaving ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <FiSave className="mr-2" />
-                        Save Chart as Image
-                      </>
-                    )}
-                  </button>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Downloads as PNG image with transparent background
-                  </p>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Value Column
+                      </h4>
+                      <p className="mt-1 text-gray-800">{selectedYAxis}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Aggregation
+                      </h4>
+                      <p className="mt-1 text-gray-800">{aggregation}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Total Bars
+                      </h4>
+                      <p className="mt-1 text-gray-800">{chartData.labels.length}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </>

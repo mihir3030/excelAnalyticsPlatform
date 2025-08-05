@@ -1,36 +1,34 @@
 import Analysis from "../models/analysisModel.js";
 
+// In analysisController.js - include aggregation in save
 export const saveAnalysisController = async (req, res) => {
   try {
-    const { uploadId, chartType, xAxis, yAxis, zAxis, aiSummary } = req.body;
+    const { uploadId, chartType, xAxis, yAxis, zAxis, aggregation, aiSummary } = req.body;
     const userId = req.user._id;
 
-    //if empty
-    // Validate required fields
     if (!uploadId || !chartType || !xAxis) {
       return res.status(400).json({
         message: "Upload ID, chart type, and X-axis are required",
       });
     }
 
-    // check if analysis with same parameter already exist or not
-    const exisitingAnalysis = await Analysis.findOne({
+    const existingAnalysis = await Analysis.findOne({
       user: userId,
       upload: uploadId,
       chartType,
       xAxis,
       yAxis: yAxis || null,
       zAxis: zAxis || null,
+      aggregation: aggregation || 'sum'  // Include aggregation in check
     });
 
-    if (exisitingAnalysis) {
+    if (existingAnalysis) {
       return res.status(409).json({
         message: "Analysis with these parameters already exists",
-        analysis: exisitingAnalysis,
+        analysis: existingAnalysis,
       });
     }
 
-    // create new Analysis
     const newAnalysis = new Analysis({
       user: userId,
       upload: uploadId,
@@ -38,12 +36,12 @@ export const saveAnalysisController = async (req, res) => {
       xAxis,
       yAxis: yAxis || undefined,
       zAxis: zAxis || undefined,
+      aggregation: aggregation || 'sum',  // Save aggregation
       aiSummary: aiSummary || "",
     });
 
     await newAnalysis.save();
 
-    // populate the response with upload details
     const populatedAnalysis = await Analysis.findById(newAnalysis._id)
       .populate("upload", "originalFileName")
       .populate("user", "username email");
@@ -60,21 +58,53 @@ export const saveAnalysisController = async (req, res) => {
   }
 };
 
-// get user saved analysis
 export const getUserAnalysisController = async (req, res) => {
   try {
     const userId = req.user._id;
 
     const analysis = await Analysis.find({ user: userId })
       .populate("upload", "originalFileName")
-      .populate("user", "username email") // optional if you want user info too
-      .sort({ createdAt: -1 }); // ← if you want newest first
+      .populate("user", "username email")
+      .sort({ createdAt: -1 });
 
-    res.status(200).json(analysis);
+    // Filter out analyses where upload is null (deleted files)
+    const validAnalyses = analysis.filter(item => item.upload !== null);
+
+    res.status(200).json(validAnalyses);
   } catch (error) {
     console.error("Error fetching analyses:", error);
     res.status(500).json({
       message: `Error fetching analyses: ${error.message}`,
+    });
+  }
+};
+
+
+// Add this to your analysis controller
+export const deleteAnalysisController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    // Find and delete the analysis (ensure user owns it)
+    const analysis = await Analysis.findOneAndDelete({
+      _id: id,
+      user: userId
+    });
+
+    if (!analysis) {
+      return res.status(404).json({
+        message: "Analysis not found or unauthorized"
+      });
+    }
+
+    res.status(200).json({
+      message: "Analysis deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting analysis:", error);
+    res.status(500).json({
+      message: `Error deleting analysis: ${error.message}`
     });
   }
 };

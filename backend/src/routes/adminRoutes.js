@@ -8,11 +8,18 @@ import {
   deleteUserUpload,
   deleteSavedChart,
   deleteUserChart,
-  getUserActivity
+  getUserActivity,
+  adminLogin
 } from "../controllers/adminControllers.js";
 import { adminAuth } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
+
+
+
+// login
+router.post("/admin-login", adminLogin)
+
 
 // middleware
 router.use(adminAuth);

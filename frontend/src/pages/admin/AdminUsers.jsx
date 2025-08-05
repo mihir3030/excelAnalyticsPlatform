@@ -44,7 +44,7 @@ function AdminUsers() {
   const handleRoleUpdate = async (userId, newRole) => {
     try {
       await axiosInstance.put(
-        `/admin/users/${userId}/role`,
+        `/admin/users/${userId}`,
         { role: newRole },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -102,12 +102,7 @@ function AdminUsers() {
             <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
             <p className="text-gray-600 mt-1">Manage all users and their permissions</p>
           </div>
-          <div className="flex items-center space-x-3">
-            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-              <FiUserPlus className="w-4 h-4 mr-2" />
-              Add User
-            </button>
-          </div>
+         
         </div>
       </div>
 

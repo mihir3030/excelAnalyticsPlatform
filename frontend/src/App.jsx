@@ -23,6 +23,10 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminUserManagement from "./pages/admin/AdminUserManagement";
 import AdminUsers from "./pages/admin/AdminUsers";
+import SavedCharts from "./pages/dashboard/SavedCharts";
+import ViewChart from "./pages/dashboard/ViewChart";
+import AdminLogin from "./pages/admin/AdminLogin";
+import PageNotFound from "./components/PageNotFound";
 
 
 function App() {
@@ -60,6 +64,10 @@ function App() {
           <Route path="user-info" element={<UserInfo />} />
           <Route path="upload-excel" element={<UploadExcel />} />
           <Route path="user-files" element={<UserFiles />} />
+          <Route path="saved-charts" element={<SavedCharts />} />
+           {/* View Chart Routes - Multiple patterns to handle different navigation scenarios */}
+         <Route path="/dashboard/saved-charts" element={<SavedCharts />} />
+        <Route path="/dashboard/saved-charts/view/:id/:chartType" element={<ViewChart />} />
 
           {/* File-specific routes with nested charts */}
           <Route path="files/:id" element={<FileAnalysis />} />
@@ -73,6 +81,9 @@ function App() {
         </Route>
 
        {/* ADMIN ROUTES */}
+       
+        <Route path="admin-login" element={<AdminLogin />} />
+
        <Route path="/admin"
        element={
         <AdminRoute>
@@ -86,6 +97,8 @@ function App() {
 
        </Route>
 
+       {/* 404 */}
+       <Route path="*" element={<PageNotFound />} />
       </Routes>
     </div>
   );

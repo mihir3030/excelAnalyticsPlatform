@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import {axiosInstance} from '../../utils/axiosUtil.js'
 import { 
   FiUpload, 
   FiX, 
@@ -16,6 +17,7 @@ import {
   FiDownload,
 } from 'react-icons/fi';
 import TopBar from '../../components/Dashboard/dashboard/TopBar';
+import { useSelector } from 'react-redux';
 
 function EnhancedUploadExcel() {
   const [file, setFile] = useState(null);
@@ -23,6 +25,7 @@ function EnhancedUploadExcel() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isUploading, setIsUploading] = useState(false);
+  const token = useSelector((state) => state.auth.token);
 
   const handleDragEnter = useCallback((e) => {
     e.preventDefault();
@@ -92,48 +95,76 @@ function EnhancedUploadExcel() {
     setMessage({ text: "", type: "" });
   };
 
-  const handleFileUpload = async () => {
+ // EnhancedUploadExcel.js
+const handleFileUpload = async () => {
     if (!file) {
-      setMessage({ 
-        text: "Please select a file to upload", 
-        type: "error" 
-      });
-      return;
+        setMessage({ 
+            text: "Please select a file to upload", 
+            type: "error" 
+        });
+        return;
     }
 
     setIsUploading(true);
     setMessage({ 
-      text: "Processing your file...", 
-      type: "info" 
+        text: "Checking file...", 
+        type: "info" 
     });
-    
-    // Simulate upload progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return prev;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 200);
 
-    // Simulate API call
-    setTimeout(() => {
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      setMessage({ 
-        text: "File uploaded successfully! Ready to create charts.", 
-        type: "success" 
-      });
-      setIsUploading(false);
-      
-      setTimeout(() => {
-        setFile(null);
-        setUploadProgress(0);
-      }, 3000);
-    }, 3000);
-  };
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await axiosInstance.post('/uploads/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            },
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round(
+                    (progressEvent.loaded * 100) / progressEvent.total
+                );
+                setUploadProgress(percentCompleted);
+            }
+        });
+
+        if (response.data.success) {
+            setMessage({ 
+                text: response.data.message || "File uploaded successfully! Ready to create charts.", 
+                type: "success" 
+            });
+            
+            // Optional: Redirect or refresh file list
+            setTimeout(() => {
+                setFile(null);
+                setUploadProgress(0);
+            }, 3000);
+        } else {
+            setMessage({ 
+                text: response.data.message || "Upload completed but with issues", 
+                type: "warning" 
+            });
+        }
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        const errorMessage = error.response?.data?.message || 
+                           error.message || 
+                           "Failed to upload file";
+        
+        setMessage({ 
+            text: errorMessage, 
+            type: "error" 
+        });
+        
+        // If duplicate file error, keep the file selected so user can rename it
+        if (!errorMessage.includes("already exists")) {
+            setUploadProgress(0);
+        }
+    } finally {
+        setIsUploading(false);
+    }
+};
 
   const getFileIcon = (fileName) => {
     const extension = fileName.split('.').pop().toLowerCase();
@@ -152,7 +183,6 @@ function EnhancedUploadExcel() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <TopBar />
      
-
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
