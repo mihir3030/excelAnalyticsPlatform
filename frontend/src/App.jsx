@@ -1,8 +1,8 @@
 import Navbar from "./components/Navbar";
 import { Route, Routes, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
+
 import DashboardPage from "./pages/DashboardPage";
-import Sidebar from "./components/Dashboard/Sidebar/Sidebar";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logout from "./components/Logout";
@@ -28,6 +28,8 @@ import ViewChart from "./pages/dashboard/ViewChart";
 import AdminLogin from "./pages/admin/AdminLogin";
 import PageNotFound from "./components/PageNotFound";
 
+import { ToastContainer } from 'react-toastify';
+
 
 function App() {
   const location = useLocation();
@@ -37,6 +39,8 @@ function App() {
   // const showSidebar = location.pathname.startsWith("/dashboard")
   return (
     <div>
+      <ToastContainer position="top-center"  />
+      
       {showNavbar && <Navbar />}
       {/* {showSidebar && <Sidebar />} */}
 

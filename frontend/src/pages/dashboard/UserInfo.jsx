@@ -22,7 +22,7 @@ function UserInfo() {
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
 
-  const [fullName, setFullname] = useState(user.fullname);
+  const [fullName, setFullname] = useState(user.fullName);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState("");
   const [profilePic, setProfilePic] = useState(null);

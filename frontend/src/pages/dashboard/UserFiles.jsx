@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setUploads } from '../../features/upload/uploadSlice'
 import { axiosInstance } from '../../utils/axiosUtil'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+
 import { 
   FiFile, 
   FiBarChart2, 
@@ -58,10 +60,10 @@ const handleDeleteFile = async (fileId) => {
       dispatch(setUploads(uploads.filter(file => file._id !== fileId)));
       
       // Show success message
-      alert("File deleted successfully");
+      toast.success("File deleted successfully");
     } catch (error) {
       console.error('Delete error:', error);
-      alert(error.response?.data?.message || "Failed to delete file");
+      toast.error(error.response?.data?.message || "Failed to delete file");
     }
   }
 };

@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { loginStart, loginSuccess, loginFailure } from "../features/auth/authSlice";
 import { axiosInstance } from '../utils/axiosUtil';
+import { toast } from 'react-toastify';
+
 import {
   Mail,
   Lock,
@@ -55,12 +57,14 @@ function LoginPage() {
       
       dispatch(loginSuccess(res.data));
       setIsSubmitted(true);
+    
       
       // Redirect after showing success message
       setTimeout(() => navigate("/dashboard"), 2000);
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Login Failed";
       dispatch(loginFailure(errorMessage));
+      toast.error(errorMessage)
     }
   };
 
@@ -109,13 +113,8 @@ function LoginPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit}>
-                    {error && (
-                      <div className="mb-6 p-4 bg-red-50 rounded-xl flex items-start">
-                        <AlertCircle className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <p className="text-red-600">{error}</p>
-                      </div>
-                    )}
                     
+                  
                     <div className="mb-6">
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                         Email Address

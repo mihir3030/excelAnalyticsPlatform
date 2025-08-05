@@ -18,6 +18,8 @@ import {
 } from 'react-icons/fi';
 import TopBar from '../../components/Dashboard/dashboard/TopBar';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+
 
 function EnhancedUploadExcel() {
   const [file, setFile] = useState(null);
@@ -70,18 +72,12 @@ function EnhancedUploadExcel() {
     ];
     
     if (!validTypes.includes(file.type)) {
-      setMessage({ 
-        text: "Please upload a valid Excel file (.xlsx, .xls, .csv)", 
-        type: "error" 
-      });
+      toast.warning("Please upload a valid Excel file (.xlsx, .xls, .csv)");
       return false;
     }
     
     if (file.size > 10 * 1024 * 1024) {
-      setMessage({ 
-        text: "File size exceeds 10MB limit", 
-        type: "error" 
-      });
+      setMessage(toast.warning("File size exceeds 10MB limit"));
       return false;
     }
     
@@ -98,18 +94,12 @@ function EnhancedUploadExcel() {
  // EnhancedUploadExcel.js
 const handleFileUpload = async () => {
     if (!file) {
-        setMessage({ 
-            text: "Please select a file to upload", 
-            type: "error" 
-        });
+        toast.warning("Please select a file to upload");
         return;
     }
 
     setIsUploading(true);
-    setMessage({ 
-        text: "Checking file...", 
-        type: "info" 
-    });
+    const toastId = toast.loading("Cheking File");
 
     try {
         const formData = new FormData();
@@ -129,10 +119,12 @@ const handleFileUpload = async () => {
         });
 
         if (response.data.success) {
-            setMessage({ 
-                text: response.data.message || "File uploaded successfully! Ready to create charts.", 
-                type: "success" 
-            });
+              toast.update(toastId, {
+                render: "File Uploaded",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+              });
             
             // Optional: Redirect or refresh file list
             setTimeout(() => {
@@ -140,10 +132,12 @@ const handleFileUpload = async () => {
                 setUploadProgress(0);
             }, 3000);
         } else {
-            setMessage({ 
-                text: response.data.message || "Upload completed but with issues", 
-                type: "warning" 
-            });
+            toast.update(toastId, {
+                render: "Uploaded with error",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
         }
 
     } catch (error) {
@@ -152,10 +146,12 @@ const handleFileUpload = async () => {
                            error.message || 
                            "Failed to upload file";
         
-        setMessage({ 
-            text: errorMessage, 
-            type: "error" 
-        });
+        toast.update(toastId, {
+                render: errorMessage,
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
         
         // If duplicate file error, keep the file selected so user can rename it
         if (!errorMessage.includes("already exists")) {
