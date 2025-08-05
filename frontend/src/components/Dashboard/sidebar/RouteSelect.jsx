@@ -1,4 +1,5 @@
-import { FiHome, FiPaperclip, FiUser, FiBarChart } from "react-icons/fi";
+import { FiHome, FiUploadCloud, FiUser, FiSave   } from "react-icons/fi";
+import { GrAnalytics } from "react-icons/gr";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Route = ({ selected, Icon, title, navigateTo, setIsOpen }) => {
@@ -51,21 +52,27 @@ function RouteSelect({ setIsOpen }) {
       />
 
       <Route
-        Icon={FiPaperclip}
+        Icon={FiUploadCloud}
         selected={false}
-        title="Analysis"
+        title="Upload File"
         navigateTo="/dashboard/upload-excel"
         setIsOpen={setIsOpen}
       />
 
       <Route
-        Icon={FiPaperclip}
+        Icon={GrAnalytics}
         selected={false}
-        title="Files"
+        title="Analysis"
         navigateTo="/dashboard/user-files"
         setIsOpen={setIsOpen}
       />
-
+      <Route
+        Icon={FiSave}
+        selected={false}
+        title="Saved Charts"
+        navigateTo="/dashboard/saved-charts"
+        setIsOpen={setIsOpen}
+      />
       <Route
         Icon={FiHome}
         selected={false}

@@ -31,6 +31,10 @@ const analysisSchema = new mongoose.Schema({
     required: false   // for pie chart
   },
   
+   aggregation: {  // Add this field
+        type: String,
+        default: 'sum'
+    },
 
   aiSummary: {
     type: String,

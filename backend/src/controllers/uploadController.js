@@ -10,59 +10,72 @@ import path from 'path';
 export const uploadFileController = async (req, res) => {
     try {
         if(!req.file) return res.status(400).json({message: "No File Uploaded"})
+
+        // Check if file already exists for this user
+        const existingFile = await Upload.findOne({
+            user: req.user._id,
+            originalFileName: req.file.originalname
+        });
+
+        if (existingFile) {
+            return res.status(400).json({
+                success: false,
+                message: "A file with this name already exists. Please rename your file or delete the existing one."
+            });
+        }
             
-        // upload file if file is present
-        const result = await new Promise((reslove, reject) => {
+        // Upload file to Cloudinary
+        const result = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
                 {
-                    resource_type: "raw",   /// because it's not image
+                    resource_type: "raw",
                     folder: 'excel-files',
-                    format: path.extname(req.file.originalname).slice(1),  // "xlsx" or "csv"
-                    public_id: path.parse(req.file.originalname).name,  // save with original name
-                    overwrite: true  // if same file name overwrite
+                    format: path.extname(req.file.originalname).slice(1),
+                    public_id: `${req.user._id}_${Date.now()}_${path.parse(req.file.originalname).name}`,
+                    overwrite: false  // Prevent overwriting
                 },
                 (error, result) => {
                     if (error) reject(error);
-                    else reslove(result)
+                    else resolve(result);
                 }
             );
-            stream.end(req.file.buffer)
+            stream.end(req.file.buffer);
         });
 
-        // convert excel sheet 0 o json
-        const workbook = XLSX.read(req.file.buffer, {type: "buffer"})
+        // Process Excel data
+        const workbook = XLSX.read(req.file.buffer, {type: "buffer"});
         const sheetname = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetname];
-        const jsonData = XLSX.utils.sheet_to_json(sheet, {defval: ""})
+        const jsonData = XLSX.utils.sheet_to_json(sheet, {defval: ""});
 
-        // extract metadata
-        const columns = jsonData.length > 0 ? Object.keys(jsonData[0]) : []  // gettings all columns
-        const rowCount = jsonData.length;
-        const dataSample = jsonData.slice(0, 5)  // preview first 5 rows
-
-
-        // save upload model
+        // Create new upload record
         const newUpload = new Upload({
             user: req.user._id,
             originalFileName: req.file.originalname,
             cloudinaryUrl: result.secure_url,
             cloudinaryPublicId: result.public_id,
             fileType: req.file.mimetype,
-            columns,
-            rowCount,
-            dataSample
-        }) 
+            columns: jsonData.length > 0 ? Object.keys(jsonData[0]) : [],
+            rowCount: jsonData.length,
+            dataSample: jsonData.slice(0, 5)
+        });
 
-        await newUpload.save()
-        console.log("upload success backend - ", newUpload)
-        res.status(201).json({newUpload})
+        await newUpload.save();
+        
+        res.status(201).json({
+            success: true,
+            upload: newUpload,
+            message: "File uploaded successfully"
+        });
 
     } catch (error) {
-        console.log("error upload backend", error);
-        res.status(500).json({message: `Internal error ${error.message}`})
-        
+        console.error("Upload error:", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Failed to upload file"
+        });
     }
-}
+};
 
 
 // get user upload files from db
@@ -107,3 +120,40 @@ export const getFileByIdController = async (req, res) => {
         res.status(500).json({message: "internal error"})
     }
 }
+
+
+// In your uploadController.js
+export const deleteFileController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // 1. Find the file to get Cloudinary public_id
+        const file = await Upload.findById(id);
+        if (!file) {
+            return res.status(404).json({
+                success: false,
+                message: "File not found"
+            });
+        }
+
+        // 2. Delete from Cloudinary
+        await cloudinary.uploader.destroy(file.cloudinaryPublicId, {
+            resource_type: "raw"
+        });
+
+        // 3. Delete from database
+        await Upload.findByIdAndDelete(id);
+
+        res.status(200).json({
+            success: true,
+            message: "File deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Delete error:", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Failed to delete file"
+        });
+    }
+};

@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser'
 
 import userAuthRoutes from './routes/userAuthRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
+import adminRoutes from './routes/adminRoutes.js'
+import analysisRoutes from './routes/analysisRoutes.js'
 
 dotenv.config()
 // create express app
@@ -30,6 +32,14 @@ app.use("/api/auth", userAuthRoutes)
 // --------- UPLOAD --------
 app.use("/api/uploads", uploadRoutes)
 
+
+//##############################
+// --------- Analysis Report --------
+app.use("/api/analysis", analysisRoutes)
+
+//##############################
+// --------- ADMIN -------------
+app.use("/api/admin", adminRoutes)
 
 
 const PORT = process.env.PORT;

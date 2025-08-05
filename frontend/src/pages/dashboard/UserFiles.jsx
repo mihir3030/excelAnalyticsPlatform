@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setUploads } from '../../features/upload/uploadSlice'
 import { axiosInstance } from '../../utils/axiosUtil'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+
 import { 
   FiFile, 
   FiBarChart2, 
@@ -17,7 +19,8 @@ import {
   FiDatabase,
   FiTrendingUp,
   FiEye,
-  FiFileText
+  FiFileText,
+  FiTrash
 } from 'react-icons/fi'
 
 function UserFiles() {
@@ -45,6 +48,25 @@ function UserFiles() {
     fetchUpload()
   }, [dispatch, token])
 
+
+const handleDeleteFile = async (fileId) => {
+  if (window.confirm("Are you sure you want to delete this file? This action cannot be undone.")) {
+    try {
+      await axiosInstance.delete(`/uploads/delete-file/${fileId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Optimistically update the UI by filtering out the deleted file
+      dispatch(setUploads(uploads.filter(file => file._id !== fileId)));
+      
+      // Show success message
+      toast.success("File deleted successfully");
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error(error.response?.data?.message || "Failed to delete file");
+    }
+  }
+};
   // Filter and sort files
   const filteredFiles = uploads ? uploads
     .filter(file => 
@@ -229,8 +251,9 @@ function UserFiles() {
                               Charts
                             </button>
                             
-                            <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200">
-                              <FiDownload className="w-4 h-4" />
+                            <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                            onClick={() => handleDeleteFile(file._id)}>
+                              <FiTrash className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -275,8 +298,9 @@ function UserFiles() {
                             Analyze
                           </button>
                           
-                          <button className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
-                            <FiDownload className='w-4 h-4' />
+                          <button className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          onClick={() => handleDeleteFile(file._id)}>
+                            <FiTrash className='w-4 h-4' />
                           </button>
                         </div>
                       </div>

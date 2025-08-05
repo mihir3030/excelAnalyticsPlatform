@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { loginStart, loginSuccess, loginFailure } from "../features/auth/authSlice";
 import { axiosInstance } from '../utils/axiosUtil';
+import { toast } from 'react-toastify';
+
 import {
   Mail,
   Lock,
@@ -55,29 +57,31 @@ function LoginPage() {
       
       dispatch(loginSuccess(res.data));
       setIsSubmitted(true);
+    
       
       // Redirect after showing success message
       setTimeout(() => navigate("/dashboard"), 2000);
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Login Failed";
       dispatch(loginFailure(errorMessage));
+      toast.error(errorMessage)
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-50 bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Login Hero Section - Matches Contact Page */}
-      <section className="relative overflow-hidden py-20 lg:py-32">
+      <section className="relative overflow-hidden py-2 lg:py-10">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
         
         {/* Animated Background Elements */}
         <div className="absolute top-20 left-10 w-50 h-50 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-60 h-60 bg-gradient-to-r from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
         
-        <div className="relative container mx-auto px-6">
+        <div className="relative container mx-auto px-6 pt-10">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight mb-6">
-              Welcome Back
+              Login Here
             </h1>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
               Sign in to access your Excel analytics dashboard and continue transforming your data into actionable insights.
@@ -109,13 +113,8 @@ function LoginPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit}>
-                    {error && (
-                      <div className="mb-6 p-4 bg-red-50 rounded-xl flex items-start">
-                        <AlertCircle className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <p className="text-red-600">{error}</p>
-                      </div>
-                    )}
                     
+                  
                     <div className="mb-6">
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                         Email Address
