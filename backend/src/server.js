@@ -18,6 +18,7 @@ app.use(express.json())
 app.use(cookieParser())
 // use cross-origin for backend connect to frontend diffrent port
 
+
 const allowedOrigins = [
   'http://localhost:5173',
   'https://astounding-quokka-f9691b.netlify.app'
