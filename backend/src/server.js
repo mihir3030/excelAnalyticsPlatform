@@ -19,6 +19,7 @@ app.use(cookieParser())
 // use cross-origin for backend connect to frontend diffrent port
 app.use(cors({
     origin: 'http://localhost:5173',
+    https://excelanalyticsplatform-4yu7.onrender.com
     // credentials: true  // allow cookie to accpets for authentication
 }))
 
