@@ -1,7 +1,9 @@
 import { FiCalendar } from 'react-icons/fi'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function TopBar() {
+  const navigate = useNavigate()
   const user = useSelector((state) => state.auth.user)
 
   // format date
@@ -29,7 +31,8 @@ function TopBar() {
 
         {/* Right: Previous Records Button */}
         <button className='flex text-sm items-center gap-2 bg-stone-100 transition-colors 
-        hover:bg-violet-100 hover:text-violet-700 px-3 py-1.5 rounded'>
+        hover:bg-violet-100 hover:text-violet-700 px-3 py-1.5 rounded'
+        onClick={() => navigate("/dashboard/user-files")}>
           <FiCalendar />
           <span>Previous Records</span>
         </button>

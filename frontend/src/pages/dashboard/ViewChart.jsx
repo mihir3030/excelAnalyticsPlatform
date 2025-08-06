@@ -424,6 +424,40 @@ const ViewChart = () => {
           {showDetails && (
             <div className={`${isFullscreen ? 'w-80 flex-shrink-0' : 'lg:col-span-1'}`}>
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+                 {/* Quick Actions */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => navigate(`/dashboard/files/${analysisData?.upload?._id || id}`)}
+                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                    >
+                      <FiEye className="mr-2" size={14} />
+                      View Source Data
+                    </button>
+                    <button
+                      onClick={downloadChart}
+                      className="w-full flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download PNG
+                    </button>
+                    {analysisData && (
+                      <button
+                        onClick={handleDeleteAnalysis}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-2"></div>
+                        ) : (
+                          <FiTrash2 className="mr-2" size={14} />
+                        )}
+                        Delete Chart
+                      </button>
+                    )}
+                  </div>
+                </div>
                 {/* Chart Info */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart Information</h3>
@@ -493,59 +527,8 @@ const ViewChart = () => {
                   </div>
                 )}
 
-                {/* Data Stats */}
-                {chartData && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Statistics</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-50 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-gray-900">{chartData.labels.length}</p>
-                        <p className="text-xs text-gray-600">Data Points</p>
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-gray-900">
-                          {Math.max(...chartData.datasets[0].data).toLocaleString()}
-                        </p>
-                        <p className="text-xs text-gray-600">Max Value</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Quick Actions */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => navigate(`/dashboard/files/${analysisData?.upload?._id || id}`)}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
-                    >
-                      <FiEye className="mr-2" size={14} />
-                      View Source Data
-                    </button>
-                    <button
-                      onClick={downloadChart}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm"
-                    >
-                      <FiDownload className="mr-2" size={14} />
-                      Download PNG
-                    </button>
-                    {analysisData && (
-                      <button
-                        onClick={handleDeleteAnalysis}
-                        disabled={loading}
-                        className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {loading ? (
-                          <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-2"></div>
-                        ) : (
-                          <FiTrash2 className="mr-2" size={14} />
-                        )}
-                        Delete Chart
-                      </button>
-                    )}
-                  </div>
-                </div>
+               
+               
               </div>
             </div>
           )}

@@ -174,10 +174,7 @@ function EnhancedFileAnalysis() {
                 <FiBarChart2 className="w-4 h-4 mr-2" />
                 Create Charts
               </button>
-              <button className="inline-flex items-center px-4 py-2 bg-white text-gray-700 font-semibold rounded-xl shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all duration-200">
-                <FiDownload className="w-4 h-4 mr-2" />
-                Export
-              </button>
+  
             </div>
           </div>
         </div>

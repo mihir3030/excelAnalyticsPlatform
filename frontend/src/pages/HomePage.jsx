@@ -8,8 +8,10 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import FooterComponent from "../components/FooterComponent";
+import { useNavigate } from "react-router-dom";
 
 function HomePage() {
+  const navigate = useNavigate()
   const [isVisible, setIsVisible] = useState({});
 
   useEffect(() => {
@@ -62,7 +64,10 @@ function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-                <button className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <button className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 
+                text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 
+                hover:shadow-2xl"
+                onClick={() => navigate("/dashboard")}>
                   <span className="relative z-10 flex items-center">
                     Go to Dashboard
                     <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

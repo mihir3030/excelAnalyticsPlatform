@@ -3,12 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setUploads } from '../../../features/upload/uploadSlice';
 import { axiosInstance } from '../../../utils/axiosUtil';
-import TopBar from '../../../components/Dashboard/dashboard/TopBar';
 import { 
   FiFile, 
   FiBarChart2, 
   FiTrendingUp, 
-  FiUsers,
   FiDatabase,
   FiPieChart,
   FiDownload,
@@ -18,7 +16,6 @@ import {
   FiEye,
   FiArrowUpRight,
   FiFolder,
-  FiZap,
   FiCircle 
 } from 'react-icons/fi';
 import { Pie} from 'react-chartjs-2';
@@ -183,7 +180,7 @@ function Grid() {
                 Upload Excel File
               </button>
               <button 
-                onClick={() => navigate('/dashboard/files')}
+                onClick={() => navigate('/dashboard/user-files')}
                 className="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all duration-200"
               >
                 <FiFolder className="w-5 h-5 mr-2" />
@@ -299,7 +296,7 @@ function Grid() {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-gray-900">Recent Saved Charts</h3>
               <button 
-                onClick={() => navigate('/dashboard/charts')}
+                onClick={() => navigate('/dashboard/saved-charts')}
                 className="text-sm text-indigo-600 hover:text-indigo-800 font-medium hover:bg-indigo-50 px-3 py-1 rounded-lg transition-all duration-200"
               >
                 View All
