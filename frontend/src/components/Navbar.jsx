@@ -1,25 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import {assets} from '../assets/assets.js'
-import { useNavigate } from 'react-router-dom'
+import { assets } from '../assets/assets.js'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 function Navbar() {
     const navigate = useNavigate()
-    
+    const location = useLocation()
+
     const navLinks = [
         { name: "Home", path: "/" },
         { name: "Contact Us", path: "/contact" },
-       
     ]
 
-    // if scrolled change color
     const [isScrolled, setIsScrolled] = useState(false)
     const [isOpenMenu, setIsOpenMenu] = useState(false)
-    const [activeLink, setActiveLink] = useState("/") // Track active link
 
     useEffect(() => {
-        setIsScrolled(window.scrollY > 10)
-
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10)
         }
@@ -28,27 +24,15 @@ function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    // Close mobile menu when clicking outside or on link
-    const closeMobileMenu = () => {
-        setIsOpenMenu(false)
-    }
+    const closeMobileMenu = () => setIsOpenMenu(false)
 
-    // Handle navigation
     const handleNavigation = (path) => {
-        setActiveLink(path)
         navigate(path)
         closeMobileMenu()
     }
 
-    // Prevent body scroll when mobile menu is open
     useEffect(() => {
-        if (isOpenMenu) {
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.body.style.overflow = 'unset'
-        }
-        
-        // Cleanup function to reset overflow when component unmounts
+        document.body.style.overflow = isOpenMenu ? 'hidden' : 'unset'
         return () => {
             document.body.style.overflow = 'unset'
         }
@@ -57,12 +41,12 @@ function Navbar() {
     return (
         <>
             <nav className={`fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 md:px-16 lg:px-24 
-                xl:px-32 transition-all duration-500 z-50 ${isScrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-transparent"}`}>
+                xl:px-32 transition-all duration-500 z-100 ${isScrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-transparent"}`}>
 
-                {/* LOGO */}
+                {/* Logo */}
                 <button onClick={() => handleNavigation('/')} className="focus:outline-none">
                     <div className={`text-2xl font-bold transition-colors duration-300 ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
-                        <img src={assets.logo} />
+                        <img src={assets.logo} alt="Logo" />
                     </div>
                 </button>
 
@@ -74,8 +58,7 @@ function Navbar() {
                             onClick={() => handleNavigation(link.path)}
                             className={`group flex flex-col pb-1 border-b-2 transition-all duration-300 hover:scale-105 focus:outline-none
                                 ${isScrolled ? 'text-gray-800 hover:text-blue-600' : 'text-black hover:text-blue-500 font-bold'} 
-                                ${activeLink === link.path ? 'border-pink-500' : 'border-transparent hover:border-pink-300'}`
-                            }
+                                ${location.pathname === link.path ? 'border-pink-500' : 'border-transparent'}`}
                         >
                             {link.name}
                         </button>
@@ -105,7 +88,7 @@ function Navbar() {
                 </button>
             </nav>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Overlay */}
             <div 
                 className={`md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-all duration-300 ${
                     isOpenMenu ? 'opacity-100 visible' : 'opacity-0 invisible'
@@ -118,8 +101,6 @@ function Navbar() {
                            transform transition-transform duration-300 ease-in-out ${
                 isOpenMenu ? 'translate-x-0' : 'translate-x-full'
             }`}>
-                
-                {/* Mobile Menu Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
                     <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         Excel Analytics
@@ -133,29 +114,28 @@ function Navbar() {
                     </button>
                 </div>
 
-                {/* Mobile Menu Content */}
+                {/* Mobile Links */}
                 <div className="flex flex-col py-6">
                     {navLinks.map((link, index) => (
                         <button
                             key={index}
                             onClick={() => handleNavigation(link.path)}
                             className={`px-6 py-4 text-lg font-semibold transition-all duration-200 border-l-4 text-left focus:outline-none
-                                ${activeLink === link.path
+                                ${location.pathname === link.path
                                     ? 'text-blue-600 bg-blue-50 border-blue-600 font-bold' 
                                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 border-transparent hover:border-gray-300'
-                                }`
-                            }
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 {link.name}
                                 <div className={`w-2 h-2 bg-current rounded-full transition-opacity duration-200 ${
-                                    activeLink === link.path ? 'opacity-100' : 'opacity-0'
+                                    location.pathname === link.path ? 'opacity-100' : 'opacity-0'
                                 }`}></div>
                             </div>
                         </button>
                     ))}
 
-                    {/* Mobile Login Button */}
+                    {/* Mobile Login */}
                     <div className="px-6 pt-6 mt-4 border-t border-gray-200">
                         <button 
                             type='button' 
@@ -171,7 +151,7 @@ function Navbar() {
                         </button>
                     </div>
 
-                    {/* Additional info */}
+                    {/* Extra info */}
                     <div className="px-6 pt-8 mt-8 border-t border-gray-200">
                         <div className="text-sm text-gray-500 text-center leading-relaxed">
                             Transform your Excel data into<br />

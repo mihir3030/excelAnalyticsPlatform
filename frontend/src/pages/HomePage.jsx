@@ -2,24 +2,12 @@ import React, { useState, useEffect } from "react";
 import './HomePage.css'
 import {
   ChevronRight,
-  Star,
-  Users,
   TrendingUp,
-  Shield,
-  Zap,
-  ArrowRight,
-  CheckCircle,
-  Mail,
-  Phone,
-  MapPin,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram,
   BarChart3,
   PieChart,
   FileSpreadsheet,
 } from "lucide-react";
+import FooterComponent from "../components/FooterComponent";
 
 function HomePage() {
   const [isVisible, setIsVisible] = useState({});
@@ -118,11 +106,11 @@ function HomePage() {
                 <div className="absolute -top-8 -left-8 bg-white rounded-2xl shadow-xl p-4 animate-float-up-down">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium">Excel Uploaded</span>
+                    <span className="text-sm font-medium">Excel Upload</span>
                   </div>
                 </div>
 
-                <div className="absolute z-100 -bottom-8 -right-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl shadow-xl p-4 animate-float-up-down animation-delay-1000">
+                <div className="absolute z-10 -bottom-8 -right-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl shadow-xl p-4 animate-float-up-down animation-delay-1000">
                   <div className="flex items-center gap-3">
                     <BarChart3 className="w-5 h-5" />
                     <span className="text-sm font-medium">Charts Ready</span>
@@ -211,106 +199,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {/* Company Info */}
-            <div className="lg:col-span-2">
-              <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Excel Analytics Platform
-              </h3>
-              <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
-                Leading provider of data analytics and AI solutions for
-                businesses. Transform your data into actionable insights with
-                our cutting-edge platform.
-              </p>
-              <div className="flex space-x-4">
-                {[Facebook, Twitter, Linkedin, Instagram].map((Icon, index) => (
-                  <button
-                    key={index}
-                    className="p-3 bg-gray-800 rounded-full hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:scale-110"
-                  >
-                    <Icon className="w-5 h-5" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
-              <ul className="space-y-3">
-                {[
-                  "Home",
-                  "About Us",
-                  "Services",
-                  "Solutions",
-                  "Pricing",
-                  "Contact",
-                ].map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Contact Info */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Contact Info</h4>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <MapPin className="w-5 h-5 mr-3 text-blue-400" />
-                  <span className="text-gray-400">
-                    123 Business Ave, Tech City
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <Phone className="w-5 h-5 mr-3 text-blue-400" />
-                  <span className="text-gray-400">+1 (555) 123-4567</span>
-                </div>
-                <div className="flex items-center">
-                  <Mail className="w-5 h-5 mr-3 text-blue-400" />
-                  <span className="text-gray-400">info@excelanalytics.com</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 mb-4 md:mb-0">
-              © 2025 Excel Analytics Platform. All rights reserved.
-            </p>
-            <div className="flex space-x-6">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Cookie Policy
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <FooterComponent />
     </div>
   );
 }
